@@ -84,5 +84,39 @@ namespace GuiSonar2
             return (m / (xx.Length));
         }
 
+        float[][] envolvente1(float[] x, int N, float fc, float fs)
+        { float[][] r=new float[2][];
+          int  M;
+          bool[] ip;
+          float[] y;
+            float av;
+
+          
+          M = (int)(fs / (2 * fc));
+          // hb = Fir1(N, 2 * fc / fs);
+          ip = find(x, 0, FindMethod.Less);
+          //x(ip)=0  en matlab;
+          for (int i = 0; i < x.Length; i++)
+          {
+              x[i] = (ip[i]) ? 0 : x[i];
+          }
+             
+          //mean:
+          for (int i = 0; i < x.Length; i++)
+          {
+              x[i] = x[i] - mean(x);
+          }
+
+          ///y = conv(x, hb);
+          avy = y.Average();
+          for (int i = 0; i < y.Length; i++)
+          {
+              y[i] = y[i] - av;
+          }
+            
+
+          return null;
+        }
+
     }
 }
