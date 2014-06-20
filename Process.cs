@@ -307,6 +307,28 @@ namespace GuiSonar2
         }
 
 
+
+        float[] conv(float[] A, float[] B, ConvMethod cm)
+        {
+            switch (cm)
+            { 
+                case ConvMethod.full :
+                    return conv(A, B);
+                case ConvMethod.valid : 
+                    return conv(A, B);
+                default :
+                    return conv(A, B); break;
+            }
+        }
+
+        private enum ConvMethod
+        {
+            full,
+            same,
+            valid
+        }
+
+
         float[] conv(float[] A, float[] B)
         {
             int nconv;
@@ -338,6 +360,39 @@ namespace GuiSonar2
             return C;
         }
 
+
+        float[] conv(float[] A, float[] B, int offset, int count, int step)
+        {
+            int i, j, i1;
+            float tmp;
+            float[] C;
+            int lenA = A.Length;
+            int lenB = B.Length;
+            int red = lenA - count - offset;
+            int nconv = (lenA + lenB - 1 - red)/step;
+
+            //allocated convolution array   
+            C = new float[nconv];
+
+            //convolution process
+            for (i = 0; i < nconv; i++)
+            {
+                i1 = i*step + offset;
+                tmp = 0.0f;
+                for (j = 0; j < lenB; j++)
+                {
+                    if (i1 >= 0 && i1 < lenA)
+                        tmp = tmp + (A[i1] * B[j]);
+
+                    i1 = i1 - 1;
+                    C[i] = tmp;
+                }
+            }
+
+            return C;
+        }
+
+
         private void testConv()
         {
             float[] x = new float[] { 1, 2, 3, 4, 5 };
@@ -359,21 +414,22 @@ namespace GuiSonar2
         {
             int Alen = A.Length;
             bool[] R = new bool[Alen];
-            
-            for (int i = 0; i < Alen; i++)
+
+            switch (fMeth)
             {
-                switch (fMeth)
-                {
-                    case FindMethod.Greater:
-                        R[i] = A[i] > b; break;
-                    case FindMethod.GreaterEqual:
+                case FindMethod.Greater:
+                    for (int i = 0; i < Alen; i++)
+                        R[i] = A[i] > b;  break;
+                case FindMethod.GreaterEqual:
+                    for (int i = 0; i < Alen; i++)
                         R[i] = A[i] >= b; break;
-                    case FindMethod.Less:
-                        R[i] = A[i] < b; break;
-                    case FindMethod.LessEqual:
+                case FindMethod.Less:
+                    for (int i = 0; i < Alen; i++)
+                        R[i] = A[i] < b;  break;
+                default:
+                    for (int i = 0; i < Alen; i++)
                         R[i] = A[i] <= b; break;
-                }
-            }
+            };
 
             return R;
         }
