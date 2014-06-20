@@ -126,7 +126,6 @@
             this.chkDetEngine.TabIndex = 2;
             this.chkDetEngine.Text = "Detectar Hélices";
             this.chkDetEngine.UseVisualStyleBackColor = true;
-            this.chkDetEngine.CheckedChanged += new System.EventHandler(this.chkDetEngine_CheckedChanged);
             // 
             // label5
             // 
@@ -161,7 +160,6 @@
             this.textPointerMag.Name = "textPointerMag";
             this.textPointerMag.Size = new System.Drawing.Size(42, 20);
             this.textPointerMag.TabIndex = 8;
-            this.textPointerMag.TextChanged += new System.EventHandler(this.textPointerMag_TextChanged);
             // 
             // textPointerTime
             // 
@@ -169,7 +167,6 @@
             this.textPointerTime.Name = "textPointerTime";
             this.textPointerTime.Size = new System.Drawing.Size(42, 20);
             this.textPointerTime.TabIndex = 7;
-            this.textPointerTime.TextChanged += new System.EventHandler(this.textPointerTime_TextChanged);
             // 
             // textPointerFrec
             // 
@@ -268,7 +265,6 @@
             this.btnAuto.TabIndex = 17;
             this.btnAuto.Text = "Auto";
             this.btnAuto.UseVisualStyleBackColor = true;
-            this.btnAuto.Click += new System.EventHandler(this.btnAuto_Click);
             // 
             // txtDetRpm
             // 
@@ -278,7 +274,6 @@
             this.txtDetRpm.Name = "txtDetRpm";
             this.txtDetRpm.Size = new System.Drawing.Size(63, 27);
             this.txtDetRpm.TabIndex = 16;
-            this.txtDetRpm.TextChanged += new System.EventHandler(this.txtDetRpm_TextChanged);
             // 
             // txtFstop
             // 
@@ -303,7 +298,6 @@
             this.txtFreq2.Size = new System.Drawing.Size(42, 13);
             this.txtFreq2.TabIndex = 12;
             this.txtFreq2.Text = "---";
-            this.txtFreq2.TextChanged += new System.EventHandler(this.txtFreq2_TextChanged);
             // 
             // txtFreq1
             // 
@@ -314,7 +308,6 @@
             this.txtFreq1.Size = new System.Drawing.Size(42, 13);
             this.txtFreq1.TabIndex = 13;
             this.txtFreq1.Text = "---";
-            this.txtFreq1.TextChanged += new System.EventHandler(this.txtFreq1_TextChanged);
             // 
             // label13
             // 
@@ -668,7 +661,6 @@
             this.pictureBox1.Size = new System.Drawing.Size(512, 426);
             this.pictureBox1.TabIndex = 15;
             this.pictureBox1.TabStop = false;
-            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
             this.pictureBox1.Resize += new System.EventHandler(this.pictureBox1_Resize);
             // 
@@ -698,7 +690,6 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(560, 613);
             this.tableLayoutPanel1.TabIndex = 18;
-            this.tableLayoutPanel1.Paint += new System.Windows.Forms.PaintEventHandler(this.tableLayoutPanel1_Paint);
             // 
             // glControl1
             // 
