@@ -56,6 +56,9 @@
     <Compile Include="ComplexF.cs" />
     <Compile Include="ComplexMath.cs" />
     <Compile Include="ComplexStats.cs" />
+    <Compile Include="FirCoeff.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
