@@ -9,7 +9,7 @@ namespace GuiSonar2
     public partial class Form1
     {
 
-        public int detectFlagPin(float[] Poli, int Fs, int NFFT, float ancho, float umbral)
+        int detectFlagPin(float[] Poli, int Fs, int NFFT, float ancho, float umbral)
         {
             int pos = 0, an, kp1, kancho;
             float maxFreqLoc, delta, madb, ma, Epor, por1, por2;
@@ -189,7 +189,7 @@ namespace GuiSonar2
                 return (int)Math.Pow(2, c);
         }
 
-        public float[] getASD(float[] samples)
+        float[] getASD(float[] samples)
         {
             float[] fSamp = new float[samples.Length];
             float[] window = new float[samples.Length];
@@ -254,7 +254,7 @@ namespace GuiSonar2
             return tmp;
         }
 
-        /* public void deteccionRPM()
+        /* void deteccionRPM()
          {
              int Freq1Val=0,Freq2Val=0;
              float fDemon,df;
@@ -300,10 +300,57 @@ namespace GuiSonar2
          }
        }*/
 
-        public float[] filtAudioData(float[] AudioData, float sldFreq1Val, float sldFreq2Val)
+        float[] filtAudioData(float[] AudioData, float sldFreq1Val, float sldFreq2Val)
         {
             float[] filtAudioOut = new float[11025];
             return filtAudioOut;
+        }
+
+
+        float[] conv(float[] A, float[] B)
+        {
+            int nconv;
+            int i, j, i1;
+            float tmp;
+            float[] C;
+            int lenA = A.Length;
+            int lenB = B.Length;
+
+            //allocated convolution array   
+            nconv = lenA + lenB - 1;
+            C = new float[nconv];
+
+            //convolution process
+            for (i = 0; i < nconv; i++)
+            {
+                i1 = i;
+                tmp = 0.0f;
+                for (j = 0; j < lenB; j++)
+                {
+                    if (i1 >= 0 && i1 < lenA)
+                        tmp = tmp + (A[i1] * B[j]);
+
+                    i1 = i1 - 1;
+                    C[i] = tmp;
+                }
+            }
+
+            return C;
+        }
+
+        private void testConv()
+        {
+            float[] x = new float[] { 1, 2, 3, 4, 5 };
+            float[] h = new float[] { 0, 1, 0 };
+            float[] z = conv(x, h);
+
+            string s = "";
+            for (int i = 0; i < z.Length; i++)
+                s += z[i] + ", ";
+
+            Console.WriteLine(s);
+
+            // Resultado: 0, 1, 2, 3, 4, 5, 0
         }
     }
 }
