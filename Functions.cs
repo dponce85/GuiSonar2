@@ -92,7 +92,7 @@ namespace GuiSonar2
             bool[] ip;
             float[] y;
             float av;
-
+            float[] hb = Fir1Coeff;
 
             M = (int)(fs / (2 * fc));
             // hb = Fir1(N, 2 * fc / fs);
