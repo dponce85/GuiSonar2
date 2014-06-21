@@ -317,7 +317,7 @@ namespace GuiSonar2
                 case ConvMethod.valid : 
                     return conv(A, B);
                 default :
-                    return conv(A, B); break;
+                    return conv(A, B);
             }
         }
 
@@ -328,6 +328,11 @@ namespace GuiSonar2
             valid
         }
 
+        static void operator + (float[] X, float y)
+        {
+            for (int i = 0; i < X.Length; i++)
+                X[i] += y;
+        }
 
         float[] conv(float[] A, float[] B)
         {
