@@ -24,31 +24,32 @@ namespace GuiSonar2
             _Cols = cols;
             _Data = new double[_Rows * _Cols];
         }
-
-        public int Length
-        { 
-            get
-            {
-                return (_Rows > _Cols) ? _Rows : _Cols;
-            }            
+        public static Matrix size(Matrix x)
+        {
+            Matrix s = new Matrix(1, 2);
+            s[0] = x._Rows;
+            s[1] = x._Cols;
+            return s;
         }
 
-        public int Numel
+        public static int length(Matrix x)
+        { 
+            return (x._Rows > x._Cols) ? x._Rows : x._Cols;
+        }
+
+        public static int numel(Matrix x)
         {
-            get
-            {
-                return _Rows * _Cols;
-            }
+            return x._Rows * x._Cols;
         }
         
         public static Matrix operator +(Matrix x, Matrix y)
         {
-            if (y.Length == 1)
-                for (int i = 0; i < x.Length; i++)
+            if (length(y) == 1)
+                for (int i = 0; i < length(x); i++)
                     x[i] += y[0];
             
-            else if (y.Length == x.Length)
-                for (int i = 0; i < x.Length; i++)
+            else if (length(y) == length(x))
+                for (int i = 0; i < length(x); i++)
                     x[i] += y[i];
 
             else
@@ -59,12 +60,12 @@ namespace GuiSonar2
 
         public static Matrix operator -(Matrix x, Matrix y)
         {
-            if (y.Length == 1)
-                for (int i = 0; i < x.Length; i++)
+            if (length(y) == 1)
+                for (int i = 0; i < length(x); i++)
                     x[i] -= y[0];
 
-            else if (y.Length == x.Length)
-                for (int i = 0; i < x.Length; i++)
+            else if (length(y) == length(x))
+                for (int i = 0; i < length(x); i++)
                     x[i] -= y[i];
 
             else
@@ -76,12 +77,12 @@ namespace GuiSonar2
 
         public static Matrix operator *(Matrix x, Matrix y)
         {
-            if (y.Length == 1)
-                for (int i = 0; i < x.Length; i++)
+            if (length(y) == 1)
+                for (int i = 0; i < length(x); i++)
                     x[i] *= y[0];
 
-            else if (y.Length == x.Length)
-                for (int i = 0; i < x.Length; i++)
+            else if (length(y) == length(x))
+                for (int i = 0; i < length(x); i++)
                     x[i] *= y[i];
 
             else
@@ -93,12 +94,12 @@ namespace GuiSonar2
 
         public static Matrix operator /(Matrix x, Matrix y)
         {
-            if (y.Length == 1)
-                for (int i = 0; i < x.Length; i++)
+            if (length(y) == 1)
+                for (int i = 0; i < length(x); i++)
                     x[i] /= y[0];
 
-            else if (y.Length == x.Length)
-                for (int i = 0; i < x.Length; i++)
+            else if (length(y) == length(x))
+                for (int i = 0; i < length(x); i++)
                     x[i] /= y[i];
 
             else
@@ -111,12 +112,12 @@ namespace GuiSonar2
         {
             Matrix z = new Matrix(size(x));
 
-            if (x.Length == 1)
-                for (int i = 0; i < x.Length; i++)
+            if (length(y) == 1)
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] > y[0]) ? 1 : 0;
 
-            else if (y.Length == x.Length)
-                for (int i = 0; i < x.Length; i++)
+            else if (length(y) == length(x))
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] > y[i]) ? 1 : 0;
 
             else
@@ -129,16 +130,16 @@ namespace GuiSonar2
         {
             Matrix z = new Matrix(size(x));
 
-            if (x.Length == 1)
-                for (int i = 0; i < x.Length; i++)
+            if (length(y) == 1)
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] >= y[0]) ? 1 : 0;
 
-            else if (y.Length == x.Length)
-                for (int i = 0; i < x.Length; i++)
+            else if (length(y) == length(x))
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] >= y[i]) ? 1 : 0;
 
             else
-                throw new ArgumentException("Error using  > \n Matrix dimensions must agree");
+                throw new ArgumentException("Error using  >= \n Matrix dimensions must agree");
 
             return x;
         }
@@ -148,16 +149,16 @@ namespace GuiSonar2
         {
             Matrix z = new Matrix(size(x));
 
-            if (x.Length == 1)
-                for (int i = 0; i < x.Length; i++)
+            if (length(y) == 1)
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] < y[0]) ? 1 : 0;
 
-            else if (y.Length == x.Length)
-                for (int i = 0; i < x.Length; i++)
+            else if (length(y) == length(x))
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] < y[i]) ? 1 : 0;
 
             else
-                throw new ArgumentException("Error using  > \n Matrix dimensions must agree");
+                throw new ArgumentException("Error using  < \n Matrix dimensions must agree");
 
             return x;
         }
@@ -166,16 +167,16 @@ namespace GuiSonar2
         {
             Matrix z = new Matrix(size(x));
 
-            if (x.Length == 1)
-                for (int i = 0; i < x.Length; i++)
+            if (length(y) == 1)
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] <= y[0]) ? 1 : 0;
 
-            else if (y.Length == x.Length)
-                for (int i = 0; i < x.Length; i++)
+            else if (length(y) == length(x))
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] <= y[i]) ? 1 : 0;
 
             else
-                throw new ArgumentException("Error using  > \n Matrix dimensions must agree");
+                throw new ArgumentException("Error using  <= \n Matrix dimensions must agree");
 
             return x;
         }
@@ -184,16 +185,16 @@ namespace GuiSonar2
         {
             Matrix z = new Matrix(size(x));
 
-            if (x.Length == 1)
-                for (int i = 0; i < x.Length; i++)
+            if (length(y) == 1)
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] == y[0]) ? 1 : 0;
 
-            else if (y.Length == x.Length)
-                for (int i = 0; i < x.Length; i++)
+            else if (length(y) == length(x))
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] == y[i]) ? 1 : 0;
 
             else
-                throw new ArgumentException("Error using  > \n Matrix dimensions must agree");
+                throw new ArgumentException("Error using  == \n Matrix dimensions must agree");
 
             return x;
         }
@@ -202,16 +203,16 @@ namespace GuiSonar2
         {
             Matrix z = new Matrix(size(x));
 
-            if (x.Length == 1)
-                for (int i = 0; i < x.Length; i++)
+            if (length(y) == 1)
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] != y[0]) ? 1 : 0;
 
-            else if (y.Length == x.Length)
-                for (int i = 0; i < x.Length; i++)
+            else if (length(y) == length(x))
+                for (int i = 0; i < length(x); i++)
                     z[i] = (x[i] != y[i]) ? 1 : 0;
 
             else
-                throw new ArgumentException("Error using  > \n Matrix dimensions must agree");
+                throw new ArgumentException("Error using  != \n Matrix dimensions must agree");
 
             return x;
         }
@@ -222,14 +223,14 @@ namespace GuiSonar2
             get
             {
                 Matrix x = new Matrix(size(idx));
-                for (int i = 0; i < idx.Numel; i++)
+                for (int i = 0; i < numel(idx); i++)
                     x[i] = this[idx[i]];
                 return x;
             }
             set
             {
                 Matrix x = new Matrix(size(idx));
-                for (int i = 0; i < idx.Numel; i++)
+                for (int i = 0; i < numel(idx); i++)
                     this[idx[i]] = value[i];
             }
         }
@@ -251,13 +252,13 @@ namespace GuiSonar2
         {
             get
             {
-                if ((i < this.Length) && (i >= 0))
+                if ((i < length(this)) && (i >= 0))
                     return _Data[i];
                 else throw new ArgumentException("Index exceeds matrix dimensions.");
             }
             set
             {
-                if ((i < this.Length) && (i >= 0))
+                if ((i < length(this)) && (i >= 0))
                     _Data[i] = value;
                 else throw new ArgumentException("Index exceeds matrix dimensions.");
             }
@@ -285,18 +286,6 @@ namespace GuiSonar2
             }
         }
 
-        public static Matrix size(Matrix x)
-        {   
-            Matrix s = new Matrix(1, 2);
-            s[0] = x._Rows;
-            s[1] = x._Cols;
-            return s; 
-        }
-
-        public static int numel(Matrix x)
-        {   
-            return x._Rows * x._Cols;
-        }
 
         public static implicit operator Matrix(int f)  // int to Matrix conversion operator
         {
@@ -345,7 +334,7 @@ namespace GuiSonar2
         public Matrix Clone()
         {
             Matrix r = new Matrix(size(this));
-            for (int i = 0; i < this.Length; i++)
+            for (int i = 0; i < length(this); i++)
                 r[i] = this[i];
 
             return r;
@@ -356,10 +345,10 @@ namespace GuiSonar2
         {
             double m = 0;
 
-            for (int i = 0; i < x.Length; i++)
+            for (int i = 0; i < length(x); i++)
                 m += x[i];
 
-            return (m / x.Length);
+            return (m / length(x));
         }
     }
 }
