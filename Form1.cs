@@ -62,7 +62,6 @@ namespace GuiSonar2
         Stopwatch stopwatch = new Stopwatch();
         Random rand = new Random();
 
-
         public Form1()
         {
             InitializeComponent();

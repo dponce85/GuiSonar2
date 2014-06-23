@@ -8,7 +8,6 @@ namespace GuiSonar2
 {
     public partial class Form1
     {
-
         int detectFlagPin(float[] Poli, int Fs, int NFFT, float ancho, float umbral)
         {
             int pos = 0, an, kp1, kancho;

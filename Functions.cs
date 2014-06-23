@@ -109,7 +109,7 @@ namespace GuiSonar2
                 x[i] = x[i] - mean(x);
             }
 
-            ///y = conv(x, hb);
+            //y = conv(x, hb);
             //av = y.Average();
             //for (int i = 0; i < y.Length; i++)
             {
