@@ -504,7 +504,5 @@ namespace GuiSonar2
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             glControlTicks.SwapBuffers();
         }
-
     }
-
 }

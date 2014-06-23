@@ -110,10 +110,10 @@ namespace GuiSonar2
             }
 
             ///y = conv(x, hb);
-            av = y.Average();
-            for (int i = 0; i < y.Length; i++)
+            //av = y.Average();
+            //for (int i = 0; i < y.Length; i++)
             {
-                y[i] = y[i] - av;
+               // y[i] = y[i] - av;
             }
 
 

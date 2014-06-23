@@ -328,11 +328,7 @@ namespace GuiSonar2
             valid
         }
 
-        static void operator + (float[] X, float y)
-        {
-            for (int i = 0; i < X.Length; i++)
-                X[i] += y;
-        }
+        
 
         float[] conv(float[] A, float[] B)
         {
