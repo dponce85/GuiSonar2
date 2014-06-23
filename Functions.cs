@@ -85,11 +85,6 @@ namespace GuiSonar2
         }
 
 
-        float prueba1()
-        {
-            return 0;
-         }
-
         float[][] envolvente1(float[] x, int N, float fc, float fs)
         {
             float[][] r = new float[2][];

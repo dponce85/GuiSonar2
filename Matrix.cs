@@ -8,14 +8,31 @@ namespace GuiSonar2
     class Matrix
     {
         private double[] _Data;
+        private bool[] _Bool;
         private int _Rows;
         private int _Cols;
+        private System.Type _Type;
+
+        public Matrix(Matrix size, Type type)
+        {
+            _Rows = (int)size[0];
+            _Cols = (int)size[1];
+            _Type = type;
+
+            if (type == typeof(double))
+                _Data = new double[_Rows * _Cols];
+            else if (type == typeof(bool))
+                _Bool = new bool[_Rows * _Cols];
+            else
+                throw new ArgumentException("Invalid type or not supported.");
+        }
 
         public Matrix(Matrix size)
         {
             _Rows = (int)size[0];
             _Cols = (int)size[1];
             _Data = new double[_Rows * _Cols];
+            _Type = typeof(double);
         }
 
         public Matrix(int rows, int cols)
@@ -41,188 +58,184 @@ namespace GuiSonar2
         {
             return x._Rows * x._Cols;
         }
-        
+
+        public int Length
+        {
+            get { return length(this); }
+        }
+
+        public Matrix Size
+        {
+            get { return size(this); }
+        }
+
+        public int Numel
+        {
+            get { return numel(this); }
+        }
+
         public static Matrix operator +(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
-
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    z[i] = x[i] + y[0];
+                    x[i] = x[i] + y[0];
             
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    z[i] = x[i] + y[i];
+                    x[i] = x[i] + y[i];
 
             else
                 throw new ArgumentException("Error using  + \n Matrix dimensions must agree");
 
-            return z;
+            return x;
         }
+
 
         public static Matrix operator -(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
-
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    z[i] = x[i] - y[0];
+                    x[i] = x[i] - y[0];
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    z[i] = x[i] - y[i];
+                    x[i] = x[i] - y[i];
 
             else
                 throw new ArgumentException("Error using  - \n Matrix dimensions must agree");
 
-            return z;
+            return x;
         }
 
 
         public static Matrix operator *(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
-
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    z[i] = x[i] * y[0];
+                    x[i] = x[i] * y[0];
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    z[i] = x[i] * y[i];
+                    x[i] = x[i] * y[i];
 
             else
                 throw new ArgumentException("Error using  * \n Matrix dimensions must agree");
 
-            return z;
+            return x;
         }
 
 
         public static Matrix operator /(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
-
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    z[i] = x[i] / y[0];
+                    x[i] = x[i] / y[0];
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    z[i] = x[i] / y[i];
+                    x[i] = x[i] / y[i];
 
             else
                 throw new ArgumentException("Error using  / \n Matrix dimensions must agree");
 
-            return z;
+            return x;
         }
 
         public static Matrix operator >(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
-
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] > y[0]) ? 1 : 0;
+                    x[i] = (x[i] > y[0]) ? 1 : 0;
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] > y[i]) ? 1 : 0;
+                    x[i] = (x[i] > y[i]) ? 1 : 0;
 
             else
                 throw new ArgumentException("Error using  > \n Matrix dimensions must agree");
 
-            return z;
+            return x;
         }
 
         public static Matrix operator >=(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
-
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] >= y[0]) ? 1 : 0;
+                    x[i] = (x[i] >= y[0]) ? 1 : 0;
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] >= y[i]) ? 1 : 0;
+                    x[i] = (x[i] >= y[i]) ? 1 : 0;
 
             else
                 throw new ArgumentException("Error using  >= \n Matrix dimensions must agree");
 
-            return z;
+            return x;
         }
 
 
-        public static Matrix operator <(Matrix x, Matrix y)
+        public static Matrix operator < (Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
-
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] < y[0]) ? 1 : 0;
+                    x[i] = (x[i] < y[0]) ? 1 : 0;
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] < y[i]) ? 1 : 0;
+                    x[i] = (x[i] < y[i]) ? 1 : 0;
 
             else
                 throw new ArgumentException("Error using  < \n Matrix dimensions must agree");
 
-            return z;
+            return x;
         }
 
-        public static Matrix operator <=(Matrix x, Matrix y)
+        public static Matrix operator <= (Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
-
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] <= y[0]) ? 1 : 0;
+                    x[i] = (x[i] <= y[0]) ? 1 : 0;
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] <= y[i]) ? 1 : 0;
+                    x[i] = (x[i] <= y[i]) ? 1 : 0;
 
             else
                 throw new ArgumentException("Error using  <= \n Matrix dimensions must agree");
 
-            return z;
+            return x;
         }
 
-        public static Matrix operator ==(Matrix x, Matrix y)
+        public static Matrix operator == (Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
-
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] == y[0]) ? 1 : 0;
+                    x[i] = (x[i] == y[0]) ? 1 : 0;
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] == y[i]) ? 1 : 0;
+                    x[i] = (x[i] == y[i]) ? 1 : 0;
 
             else
                 throw new ArgumentException("Error using  == \n Matrix dimensions must agree");
 
-            return z;
+            return x;
         }
 
         public static Matrix operator !=(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
-
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] != y[0]) ? 1 : 0;
+                    x[i] = (x[i] != y[0]) ? 1 : 0;
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    z[i] = (x[i] != y[i]) ? 1 : 0;
+                    x[i] = (x[i] != y[i]) ? 1 : 0;
 
             else
                 throw new ArgumentException("Error using  != \n Matrix dimensions must agree");
 
-            return z;
+            return x;
         }
 
         public override bool Equals(object obj)
