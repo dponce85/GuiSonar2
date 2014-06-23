@@ -44,68 +44,76 @@ namespace GuiSonar2
         
         public static Matrix operator +(Matrix x, Matrix y)
         {
+            Matrix z = new Matrix(size(x));
+
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    x[i] += y[0];
+                    z[i] = x[i] + y[0];
             
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    x[i] += y[i];
+                    z[i] = x[i] + y[i];
 
             else
                 throw new ArgumentException("Error using  + \n Matrix dimensions must agree");
 
-            return x;
+            return z;
         }
 
         public static Matrix operator -(Matrix x, Matrix y)
         {
+            Matrix z = new Matrix(size(x));
+
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    x[i] -= y[0];
+                    z[i] = x[i] - y[0];
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    x[i] -= y[i];
+                    z[i] = x[i] - y[i];
 
             else
                 throw new ArgumentException("Error using  - \n Matrix dimensions must agree");
 
-            return x;
+            return z;
         }
 
 
         public static Matrix operator *(Matrix x, Matrix y)
         {
+            Matrix z = new Matrix(size(x));
+
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    x[i] *= y[0];
+                    z[i] = x[i] * y[0];
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    x[i] *= y[i];
+                    z[i] = x[i] * y[i];
 
             else
                 throw new ArgumentException("Error using  * \n Matrix dimensions must agree");
 
-            return x;
+            return z;
         }
 
 
         public static Matrix operator /(Matrix x, Matrix y)
         {
+            Matrix z = new Matrix(size(x));
+
             if (length(y) == 1)
                 for (int i = 0; i < length(x); i++)
-                    x[i] /= y[0];
+                    z[i] = x[i] / y[0];
 
             else if (length(y) == length(x))
                 for (int i = 0; i < length(x); i++)
-                    x[i] /= y[i];
+                    z[i] = x[i] / y[i];
 
             else
                 throw new ArgumentException("Error using  / \n Matrix dimensions must agree");
 
-            return x;
+            return z;
         }
 
         public static Matrix operator >(Matrix x, Matrix y)
@@ -123,7 +131,7 @@ namespace GuiSonar2
             else
                 throw new ArgumentException("Error using  > \n Matrix dimensions must agree");
 
-            return x;
+            return z;
         }
 
         public static Matrix operator >=(Matrix x, Matrix y)
@@ -141,7 +149,7 @@ namespace GuiSonar2
             else
                 throw new ArgumentException("Error using  >= \n Matrix dimensions must agree");
 
-            return x;
+            return z;
         }
 
 
@@ -160,7 +168,7 @@ namespace GuiSonar2
             else
                 throw new ArgumentException("Error using  < \n Matrix dimensions must agree");
 
-            return x;
+            return z;
         }
 
         public static Matrix operator <=(Matrix x, Matrix y)
@@ -178,7 +186,7 @@ namespace GuiSonar2
             else
                 throw new ArgumentException("Error using  <= \n Matrix dimensions must agree");
 
-            return x;
+            return z;
         }
 
         public static Matrix operator ==(Matrix x, Matrix y)
@@ -196,7 +204,7 @@ namespace GuiSonar2
             else
                 throw new ArgumentException("Error using  == \n Matrix dimensions must agree");
 
-            return x;
+            return z;
         }
 
         public static Matrix operator !=(Matrix x, Matrix y)
@@ -214,9 +222,19 @@ namespace GuiSonar2
             else
                 throw new ArgumentException("Error using  != \n Matrix dimensions must agree");
 
-            return x;
+            return z;
         }
 
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+        
 
         public Matrix this[Matrix idx]
         {
