@@ -110,6 +110,20 @@ namespace GuiSonar2
         0.00111378F,
         0.00108424F       
         };
+
+        float[] NumCoeff = new float[]{
+        0.1011F,
+        -0.4043F,
+        0.6065F,
+        -0.4043F,
+        0.1011F};
+
+        float[] DenCoeff = new float[]{
+        1.0F,
+        -0.0915F,
+        0.4887F,
+        -0.0192F,
+        0.0178F};
     }
 
 }

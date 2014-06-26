@@ -7,50 +7,35 @@ namespace GuiSonar2
 {
     public partial class Form1
     {
-        void filter()
+        float[] filter(float[] B, float[] A, float[] xk)
         {
             int N = 4;
-            float[] xx = new float[512];
-            float[] NumCoeff = new float[5];
-            float[] DenCoeff = new float[5];
-            float[] Signal = new float[xx.Length];
-            Signal = xx;
-            float[] FilteredSignal = new float[xx.Length];
+            float[] NumCoeff = B;
+            float[] DenCoeff = A;
+            float[] Signal = new float[xk.Length];
+            Signal = xk;
+            float[] FilteredSignal = new float[xk.Length];
             float[] Reg = new float[100];
             int NumSigPts;
-            //  FilteredSignal = zeros(size(x));
-            //  Reg = zeros(size(x));
 
-
-            for (int i = 0; i < xx.Length; i++)
-            {
-
-                FilteredSignal[i] = 0;
-
-            }
+            for (int i = 0; i < xk.Length; i++)
+            { FilteredSignal[i] = 0; }
 
             for (int i = 0; i < 100; i++)
-            {
-                Reg[i] = 0;
-            }
+            { Reg[i] = 0; }
 
             NumSigPts = Signal.Length;
 
             for (int j = 0; j < NumSigPts; j++)
             {
                 for (int k = N; k >= 1; k--)
-                {
-                    Reg[k] = Reg[k - 1];
-                }
+                { Reg[k] = Reg[k - 1]; }
 
                 // El denominador
                 Reg[0] = Signal[j];
 
                 for (int k = 1; k <= N; k++)
-                {
-                    Reg[0] = Reg[0] - DenCoeff[k] * Reg[k];
-
-                }
+                { Reg[0] = Reg[0] - DenCoeff[k] * Reg[k]; }
 
                 // El numerador
                 float y = 0;
@@ -59,7 +44,6 @@ namespace GuiSonar2
                     y = y + NumCoeff[k] * Reg[k];
                     FilteredSignal[j] = y;
                 }
-
             }
 
             /*
@@ -68,76 +52,77 @@ namespace GuiSonar2
             ff2 = fft(FilteredSignal);
             figure, plot(abs(ff2(1:end/2)));
             */
-
+            return FilteredSignal;
         }
 
-      
         float[][] envolvente1(Matrix x, int N, float fc, float fs)
         {
             float[][] r = new float[2][];
             int M;
             float[] y;
             float[] hb = Fir1Coeff;
-            
+
             M = (int)(fs / (2 * fc));
             //hb = Fir1(N, 2 * fc / fs);
-           
+
             for (int i = 0; i < x.Length; i++)
-               if( x[i] < 0) x[i] = 0;
-            
+                if (x[i] < 0) x[i] = 0;
+
             //mean:
             x = x - mean(x);
 
             y = conv(double2float(x), hb, ConvMethod.full);
-            Matrix y2=new double[y.Length%M];
-            for (int i=0; i < y.Length; i=i+M)
+            Matrix y2 = new double[y.Length % M];
+            for (int i = 0; i < y.Length; i = i + M)
             {
-                y2[i] = y[i];  
+                y2[i] = y[i];
             }
 
             y2 = y2 - mean(y2);
 
-
             r[0] = double2float(y2);
-            r[1][0] = fs/M;
+            r[1][0] = fs / M;
+            
             return r;
         }
 
-        float[][] envolventeban(Matrix B51k, Matrix B52k, Matrix B53k, Matrix B54k, Matrix B55k, Matrix B56k,Matrix B57k,Matrix B58k, int ord, float fc1, float fs1)
+        float[][] envolventeban(Matrix B51k, Matrix B52k, Matrix B53k, Matrix B54k, Matrix B55k, Matrix B56k, Matrix B57k, Matrix B58k, int ord, float fc1, float fs1)
         {
-          float av;  
-          float[][] B5=new float[9][];
-          B5[0] = envolvente1(B51k, ord, fc1, fs1)[0];
-          B5[1] = envolvente1(B52k, ord, fc1, fs1)[0];
-          B5[2] = envolvente1(B53k, ord, fc1, fs1)[0];
-          B5[3] = envolvente1(B54k, ord, fc1, fs1)[0];
-          B5[4] = envolvente1(B55k, ord, fc1, fs1)[0];
-          B5[5] = envolvente1(B56k, ord, fc1, fs1)[0];
-          B5[6] = envolvente1(B57k, ord, fc1, fs1)[0];
-          B5[7] = envolvente1(B58k, ord, fc1, fs1)[0];
-          B5[8][0] = envolvente1(B58k, ord, fc1, fs1)[1][0];
+            float av;
+            float[][] B5 = new float[9][];
+            B5[0] = envolvente1(B51k, ord, fc1, fs1)[0];
+            B5[1] = envolvente1(B52k, ord, fc1, fs1)[0];
+            B5[2] = envolvente1(B53k, ord, fc1, fs1)[0];
+            B5[3] = envolvente1(B54k, ord, fc1, fs1)[0];
+            B5[4] = envolvente1(B55k, ord, fc1, fs1)[0];
+            B5[5] = envolvente1(B56k, ord, fc1, fs1)[0];
+            B5[6] = envolvente1(B57k, ord, fc1, fs1)[0];
+            B5[7] = envolvente1(B58k, ord, fc1, fs1)[0];
+            B5[8][0] = envolvente1(B58k, ord, fc1, fs1)[1][0];
 
-          for (int j = 0; j < 8; j++)
-          {
-              av = B5[j].Average();
-              for (int i = 0; i < B5[0].Length; i++)
-              B5[j][i] = B5[j][i] - av;
-          }
+            for (int j = 0; j < 8; j++)
+            {
+                av = B5[j].Average();
+                for (int i = 0; i < B5[0].Length; i++)
+                { B5[j][i] = B5[j][i] - av; }
+            }
 
-          return B5;
+            return B5;
         }
 
+
+         
         float[][] decima(Matrix BEN, float f0, float fsb, float sensi, float ct, float FAV, float boc, float tipve)
         {
             float[][] r = new float[6][];
-            float[] B; 
+            float[] B;
             float[] h;
             float fs1 = 2 * 10 * f0;
             int M = (int)Math.Round(fsb / fs1);
             bool[] ip;
             float k;
             if (M > 1)
-                h = fir400(400, 1.0f / M);
+                h = fir1_400(400, 1.0f / M);
             else
                 fs1 = fsb;
 
@@ -145,12 +130,16 @@ namespace GuiSonar2
 
             k = 1;
 
-            for (int u; u < ip.Length; u++ )
+            for (int u = 0; u < ip.Length; u++)
             {
                 for (int f = 0; f < BEN.Size[0]; f++)
-                { 
-                    
-                
+                {
+                    B = BEN[f][ip[u]];
+                }
+
+                if (M > 1)
+                {
+                    B = filter(h, 1, B);
                 }
             }
 
@@ -202,9 +191,9 @@ namespace GuiSonar2
             float[] tmp = new float[x.Length];
 
             tmp = Array.ConvertAll(x, element => (float)element);
-            
+
             return tmp;
-            
+
         }
 
         float[] hw0 = new float[]{
