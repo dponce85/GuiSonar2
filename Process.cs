@@ -410,7 +410,7 @@ namespace GuiSonar2
 
 
 
-        bool[] find(float[] A, float b, FindMethod fMeth)
+        bool[] find(double[] A, float b, FindMethod fMeth)
         {
             int Alen = A.Length;
             bool[] R = new bool[Alen];

@@ -109,7 +109,7 @@ namespace GuiSonar2
 
         public static Matrix operator >(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
+            Matrix z = new Matrix(Size(x));
 
             if (x.Length == 1)
                 for (int i = 0; i < x.Length; i++)
@@ -127,7 +127,7 @@ namespace GuiSonar2
 
         public static Matrix operator >=(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
+            Matrix z = new Matrix(Size(x));
 
             if (x.Length == 1)
                 for (int i = 0; i < x.Length; i++)
@@ -146,7 +146,7 @@ namespace GuiSonar2
 
         public static Matrix operator <(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
+            Matrix z = new Matrix(Size(x));
 
             if (x.Length == 1)
                 for (int i = 0; i < x.Length; i++)
@@ -164,7 +164,7 @@ namespace GuiSonar2
 
         public static Matrix operator <=(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
+            Matrix z = new Matrix(Size(x));
 
             if (x.Length == 1)
                 for (int i = 0; i < x.Length; i++)
@@ -182,7 +182,7 @@ namespace GuiSonar2
 
         public static Matrix operator ==(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
+            Matrix z = new Matrix(Size(x));
 
             if (x.Length == 1)
                 for (int i = 0; i < x.Length; i++)
@@ -200,7 +200,7 @@ namespace GuiSonar2
 
         public static Matrix operator !=(Matrix x, Matrix y)
         {
-            Matrix z = new Matrix(size(x));
+            Matrix z = new Matrix(Size(x));
 
             if (x.Length == 1)
                 for (int i = 0; i < x.Length; i++)
@@ -221,14 +221,14 @@ namespace GuiSonar2
         {
             get
             {
-                Matrix x = new Matrix(size(idx));
+                Matrix x = new Matrix(Size(idx));
                 for (int i = 0; i < idx.Numel; i++)
                     x[i] = this[idx[i]];
                 return x;
             }
             set
             {
-                Matrix x = new Matrix(size(idx));
+                Matrix x = new Matrix(Size(idx));
                 for (int i = 0; i < idx.Numel; i++)
                     this[idx[i]] = value[i];
             }
@@ -285,12 +285,15 @@ namespace GuiSonar2
             }
         }
 
-        public static Matrix size(Matrix x)
+        public Matrix Size
         {   
-            Matrix s = new Matrix(1, 2);
-            s[0] = x._Rows;
-            s[1] = x._Cols;
-            return s; 
+            get
+            {
+                Matrix s = new Matrix(1, 2);
+                s[0] = this._Rows;
+                s[1] = this._Cols;
+                return s;
+            }
         }
 
         public static int numel(Matrix x)
@@ -344,7 +347,7 @@ namespace GuiSonar2
 
         public Matrix Clone()
         {
-            Matrix r = new Matrix(size(this));
+            Matrix r = new Matrix(Size(this));
             for (int i = 0; i < this.Length; i++)
                 r[i] = this[i];
 

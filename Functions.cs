@@ -41,7 +41,6 @@ namespace GuiSonar2
                 for (int k = N; k >= 1; k--)
                 {
                     Reg[k] = Reg[k - 1];
-
                 }
 
                 // El denominador
@@ -72,57 +71,112 @@ namespace GuiSonar2
 
         }
 
-        float mean(float[] xx)
-        {
-            float m = 0;
-
-            for (int i = 0; i < xx.Length; i++)
-            {
-                m = m + xx[i];
-            }
-
-            return (m / (xx.Length));
-        }
-
-
-        float prueba1()
-        {
-            return 0;
-         }
-
-        float[][] envolvente1(float[] x, int N, float fc, float fs)
+      
+        float[][] envolvente1(Matrix x, int N, float fc, float fs)
         {
             float[][] r = new float[2][];
             int M;
-            bool[] ip;
             float[] y;
-            float av;
             float[] hb = Fir1Coeff;
-
+            
             M = (int)(fs / (2 * fc));
-            // hb = Fir1(N, 2 * fc / fs);
-            ip = find(x, 0, FindMethod.Less);
-            //x(ip)=0  en matlab;
+            //hb = Fir1(N, 2 * fc / fs);
+           
             for (int i = 0; i < x.Length; i++)
-            {
-                x[i] = (ip[i]) ? 0 : x[i];
-            }
-
+               if( x[i] < 0) x[i] = 0;
+            
             //mean:
-            for (int i = 0; i < x.Length; i++)
+            x = x - mean(x);
+
+            y = conv(double2float(x), hb, ConvMethod.full);
+            Matrix y2=new double[y.Length%M];
+            for (int i=0; i < y.Length; i=i+M)
             {
-                x[i] = x[i] - mean(x);
+                y2[i] = y[i];  
             }
 
-            //y = conv(x, hb);
-            //av = y.Average();
-            //for (int i = 0; i < y.Length; i++)
+            y2 = y2 - mean(y2);
+
+
+            r[0] = double2float(y2);
+            r[1][0] = fs/M;
+            return r;
+        }
+
+        float[][] envolventeban(Matrix B51k, Matrix B52k, Matrix B53k, Matrix B54k, Matrix B55k, Matrix B56k,Matrix B57k,Matrix B58k, int ord, float fc1, float fs1)
+        {
+          float av;  
+          float[][] B5=new float[9][];
+          B5[0] = envolvente1(B51k, ord, fc1, fs1)[0];
+          B5[1] = envolvente1(B52k, ord, fc1, fs1)[0];
+          B5[2] = envolvente1(B53k, ord, fc1, fs1)[0];
+          B5[3] = envolvente1(B54k, ord, fc1, fs1)[0];
+          B5[4] = envolvente1(B55k, ord, fc1, fs1)[0];
+          B5[5] = envolvente1(B56k, ord, fc1, fs1)[0];
+          B5[6] = envolvente1(B57k, ord, fc1, fs1)[0];
+          B5[7] = envolvente1(B58k, ord, fc1, fs1)[0];
+          B5[8][0] = envolvente1(B58k, ord, fc1, fs1)[1][0];
+
+          for (int j = 0; j < 8; j++)
+          {
+              av = B5[j].Average();
+              for (int i = 0; i < B5[0].Length; i++)
+              B5[j][i] = B5[j][i] - av;
+          }
+
+          return B5;
+        }
+
+        float[][] decima(Matrix BEN, float f0, float fsb, float sensi, float ct, float FAV, float boc, float tipve)
+        {
+            float[][] r = new float[6][];
+            float[] B; 
+            float[] h;
+            float fs1 = 2 * 10 * f0;
+            int M = (int)Math.Round(fsb / fs1);
+            bool[] ip;
+            float k;
+            if (M > 1)
+                h = fir400(400, 1.0f / M);
+            else
+                fs1 = fsb;
+
+            ip = find(ct, sensi, FindMethod.Less);
+
+            k = 1;
+
+            for (int u; u < ip.Length; u++ )
             {
-               // y[i] = y[i] - av;
+                for (int f = 0; f < BEN.Size[0]; f++)
+                { 
+                    
+                
+                }
             }
 
+            return r;
+        }
 
-            return null;
+
+
+        private float[] double2float(Matrix x)
+        {
+            throw new NotImplementedException();
+        }
+
+        private float[] mean(float[] y)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool[] find(Matrix x, int p, FindMethod findMethod)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Matrix mean(Matrix x)
+        {
+            throw new NotImplementedException();
         }
 
 
@@ -141,6 +195,16 @@ namespace GuiSonar2
                 ret[j++] = X[i];
 
             return ret;
+        }
+
+        float[] double2float(double[] x)
+        {
+            float[] tmp = new float[x.Length];
+
+            tmp = Array.ConvertAll(x, element => (float)element);
+            
+            return tmp;
+            
         }
 
         float[] hw0 = new float[]{
