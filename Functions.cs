@@ -82,7 +82,7 @@ namespace GuiSonar2
 
             r[0] = double2float(y2);
             r[1][0] = fs / M;
-            
+
             return r;
         }
 
@@ -111,7 +111,7 @@ namespace GuiSonar2
         }
 
 
-         
+
         float[][] decima(Matrix BEN, float f0, float fsb, float sensi, float ct, float FAV, float boc, float tipve)
         {
             float[][] r = new float[6][];
@@ -195,6 +195,98 @@ namespace GuiSonar2
             return tmp;
 
         }
+
+        double[] my_fir1(int N, float Wn)
+{
+
+const float PI =(float)Math.PI;
+    int Pr_L = N+1;         
+/* FIR filter
+Return an array of 1 X 256
+*/
+   
+int odd, i, j, nhlf, i1;
+float f1, gain, c1;
+float[] wind = new float[Pr_L/2];
+float[] xn = new float[Pr_L/2];
+float[] b  = new float[Pr_L/2];
+float[] c  = new float[Pr_L/2];
+float[] c3 = new float[Pr_L/2];
+float[] bb = new float[Pr_L];
+
+//bb = (double *) malloc(sizeof(double) * Pr_L);
+
+gain = 0;
+N = N+1;
+odd = N - (N/2)*2; /* odd = rem(N,2) */
+
+/*wind = hamming(N);*/
+for (i=0; i < Pr_L; i++)
+{
+wind[i] = (float)(0.54 -(0.46 * Math.Cos ((2 *PI* i) / (N-1))));
+}
+
+f1 = Wn / 2.0f;
+c1 = f1;
+nhlf = (N+1) / 2;
+i1 = odd + 1;
+
+/* Lowpass */
+
+if(odd!=0)
+b[0] = 2 * c1;
+
+for (i=0; i < nhlf; i++)
+{
+xn[i] = i + 0.5f * (1 - odd);
+}
+
+for (i=0; i < nhlf; i++)
+{
+c[i] = PI*xn[i];
+}
+
+for (i=0; i < nhlf; i++)
+{
+c3[i] = 2 * c1 * c[i];
+}
+
+/* b(i1:nhlf)=(sin(c3)./c) */
+for (i=0; i < nhlf; i++)
+{
+b[i] = (float)Math.Sin(c3[i]) / c[i];
+}
+
+/* bb = real([b(nhlf:-1:i1) b(1:nhlf)].*wind(:)') */
+for (i=0,j=nhlf-1; i < nhlf; i++, j--)
+{
+bb[i] = b[j];
+}
+for (i=nhlf,j=0; i < Pr_L; i++,j++)
+{
+bb[i] = b[j];
+}
+for (i=0; i < Pr_L; i++)
+{
+bb[i] = bb[i] * wind[i];
+}
+
+/* gain = abs(polyval(b,1)); */
+for (i=0; i < Pr_L; i++)
+{
+gain += bb[i];
+}
+/* b = b / gain */
+for (i=0; i < Pr_L; i++)
+{
+bb[i] = bb[i] / gain;
+}
+
+return bb;
+
+}
+
+
 
         float[] hw0 = new float[]{
             -0.00000000F,
