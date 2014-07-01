@@ -55,13 +55,13 @@ namespace GuiSonar2
             return FilteredSignal;
         }
 
-        float[][] envolvente1(Matrix x, int N, float fc, float fs)
+        float[][] envolvente1(float[] x, int N, float fc, float fs)
         {
             float[][] r = new float[2][];
             int M;
             float[] y;
             float[] hb = Fir1Coeff;
-
+            float av;
             M = (int)(fs / (2 * fc));
             //hb = Fir1(N, 2 * fc / fs);
 
@@ -69,24 +69,31 @@ namespace GuiSonar2
                 if (x[i] < 0) x[i] = 0;
 
             //mean:
-            x = x - mean(x);
-
-            y = conv(double2float(x), hb, ConvMethod.full);
-            Matrix y2 = new double[y.Length % M];
+            av = x.Average();
+            for (int i = 0; i < x.Length; i++)
+            {
+                x[i] = x[i] - av;
+            }
+            y = conv(x, hb, ConvMethod.full);
+            float[] y2 = new float[y.Length % M];
             for (int i = 0; i < y.Length; i = i + M)
             {
                 y2[i] = y[i];
             }
 
-            y2 = y2 - mean(y2);
+            av = y2.Average();
+            for (int i = 0; i < y2.Length; i++)
+            {
+                y2[i] = y2[i] - av;
+            }
 
-            r[0] = double2float(y2);
+            r[0] = y2;
             r[1][0] = fs / M;
 
             return r;
         }
 
-        float[][] envolventeban(Matrix B51k, Matrix B52k, Matrix B53k, Matrix B54k, Matrix B55k, Matrix B56k, Matrix B57k, Matrix B58k, int ord, float fc1, float fs1)
+        float[][] envolventeban(float[] B51k, float[] B52k, float[] B53k, float[] B54k, float[] B55k, float[] B56k, float[] B57k, float[] B58k, int ord, float fc1, float fs1)
         {
             float av;
             float[][] B5 = new float[9][];
@@ -110,9 +117,7 @@ namespace GuiSonar2
             return B5;
         }
 
-
-
-        float[][] decima(Matrix BEN, float f0, float fsb, float sensi, float ct, float FAV, float boc, float tipve)
+        /*float[][] decima(float[][] BEN, float f0, float fsb, float sensi, float ct, float FAV, float boc, float tipve)
         {
             float[][] r = new float[6][];
             float[] B;
@@ -145,28 +150,16 @@ namespace GuiSonar2
 
             return r;
         }
+        */
 
 
 
-        private float[] double2float(Matrix x)
+        private bool[] find(float[] x, int p, FindMethod findMethod)
         {
             throw new NotImplementedException();
         }
 
-        private float[] mean(float[] y)
-        {
-            throw new NotImplementedException();
-        }
 
-        private bool[] find(Matrix x, int p, FindMethod findMethod)
-        {
-            throw new NotImplementedException();
-        }
-
-        private Matrix mean(Matrix x)
-        {
-            throw new NotImplementedException();
-        }
 
 
 
@@ -196,95 +189,207 @@ namespace GuiSonar2
 
         }
 
-        double[] my_fir1(int N, float Wn)
-{
+        float[][] detecarm33(float[] FV, float f0, float delta, float[] f, float sensar)
+        {
+            float[][] r = new float[7][];
+            float[] FV2 = new float[FV.Length];
+            float[] FV1;
 
-const float PI =(float)Math.PI;
-    int Pr_L = N+1;         
-/* FIR filter
-Return an array of 1 X 256
-*/
-   
-int odd, i, j, nhlf, i1;
-float f1, gain, c1;
-float[] wind = new float[Pr_L/2];
-float[] xn = new float[Pr_L/2];
-float[] b  = new float[Pr_L/2];
-float[] c  = new float[Pr_L/2];
-float[] c3 = new float[Pr_L/2];
-float[] bb = new float[Pr_L];
+            float fmin = 0;
+            float ma;
+            float ik1, ik2, k1, k2;
+            float lim1;
+            float[] k = new float[2];
+            float[] mak = new float[2];
+            float ban = 0;
+            int p1, p2;
+            int nar = 0;
+            int L = 0;
+            int pos = 0;
+            int tol;
+            int Na;
+            int[] ivj = new int[2];
 
-//bb = (double *) malloc(sizeof(double) * Pr_L);
+            nar = 0;
+            fmin = 0.5f;
+            k1 = (int)Math.Round(fmin / delta);
+            FV1 = FV;
+            //FV1(1:K1) = 0;
+            for (int i = 0; i < k1; i++)
+            {
+                FV1[i] = 0;
+            }
 
-gain = 0;
-N = N+1;
-odd = N - (N/2)*2; /* odd = rem(N,2) */
+            L  = FV1.Length ;
+            
+            ma = FV1.Length ;
+            pos = indexMax(FV1);
+            ik1 = pico(FV1, pos, L)[0];
+            ik2 = pico(FV1, pos, L)[1];
+            k1  = pico(FV1, pos, L)[2];
+            k2  = pico(FV1, pos, L)[3];
 
-/*wind = hamming(N);*/
-for (i=0; i < Pr_L; i++)
-{
-wind[i] = (float)(0.54 -(0.46 * Math.Cos ((2 *PI* i) / (N-1))));
-}
+           tol = (int)Math.Round((ik2 - ik1 + 1)/2.0f);
+           k[0] = k1;
+           k[1] = k2;
+           lim1 = k.Min();
+           p1 = pos - tol;
+           p2 = pos - tol;
 
-f1 = Wn / 2.0f;
-c1 = f1;
-nhlf = (N+1) / 2;
-i1 = odd + 1;
+           if (p1 < 0)
+           { p1 = 0; }
 
-/* Lowpass */
+           if (p2 > L)
+           { p2 = L-1; }
 
-if(odd!=0)
-b[0] = 2 * c1;
+           //FV1(p1:p2) = 0  
+           for (int i = p1; i <= p2; i++)
+           {
+               FV1[i] = 0;
+           }
 
-for (i=0; i < nhlf; i++)
-{
-xn[i] = i + 0.5f * (1 - odd);
-}
+           Na = 10;
+           ivj[0] = pos;
+           mak[0] = ma;
 
-for (i=0; i < nhlf; i++)
-{
-c[i] = PI*xn[i];
-}
+           ban = 0;
+           cont = 1;
 
-for (i=0; i < nhlf; i++)
-{
-c3[i] = 2 * c1 * c[i];
-}
+           List<double> abc = new List<double>();
 
-/* b(i1:nhlf)=(sin(c3)./c) */
-for (i=0; i < nhlf; i++)
-{
-b[i] = (float)Math.Sin(c3[i]) / c[i];
-}
+            abc.Add(13.4);
 
-/* bb = real([b(nhlf:-1:i1) b(1:nhlf)].*wind(:)') */
-for (i=0,j=nhlf-1; i < nhlf; i++, j--)
-{
-bb[i] = b[j];
-}
-for (i=nhlf,j=0; i < Pr_L; i++,j++)
-{
-bb[i] = b[j];
-}
-for (i=0; i < Pr_L; i++)
-{
-bb[i] = bb[i] * wind[i];
-}
+            double[] empty;
+            abc.CopyTo(empty, 0);
+            
 
-/* gain = abs(polyval(b,1)); */
-for (i=0; i < Pr_L; i++)
-{
-gain += bb[i];
-}
-/* b = b / gain */
-for (i=0; i < Pr_L; i++)
-{
-bb[i] = bb[i] / gain;
-}
+           while (ban == 0)
+           { 
+             ma = FV1.Max();    
+             pos = indexMax(FV1); 
+             
+             ivj[0] = ivj[0];
+             ivj[1] = pos;
+             mak[0] = mak[0];
+             mak[1] = ma;
+             cont=cont+1;
+      
+              if( cont==Na)
+              { ban=1;} 
+                        
+              p1=pos-tol;
+              p2=pos+tol;
+              if( p1<1)
+              { p1=1; }
+             
+              if( p2>L)
+              { p2=L;}
+                 
+              //FV1(p1:p2)=0;
+               for( int i=p1;i<=p2;i++)
+               {
+                 FV1[i] = 0;
+               }
+               
+              if(FV1.Sum()==0)
+              { ban=1;}
+           
+            }
 
-return bb;
 
-}
+               return r;
+        }
+
+        float[] fir1_400(int N, float Wn)
+        {
+
+            const float PI = (float)Math.PI;
+            int Pr_L = N + 1;
+            /* FIR filter
+            Return an array of 1 x 256
+            */
+
+            int odd, i, j, nhlf, i1;
+            float f1, gain, c1;
+            float[] wind = new float[Pr_L];
+            float[] xn = new float[Pr_L / 2];
+            float[] b = new float[Pr_L / 2];
+            float[] c = new float[Pr_L / 2];
+            float[] c3 = new float[Pr_L / 2];
+            float[] bb = new float[Pr_L];
+
+            //bb = (double *) malloc(sizeof(double) * Pr_L);
+
+            gain = 0;
+            N = N + 1;
+            odd = N - (N / 2) * 2; /* odd = rem(N,2) */
+
+            /*wind = hamming(N);*/
+            for (i = 0; i < Pr_L; i++)
+            {
+                wind[i] = (float)(0.54 - (0.46 * Math.Cos((2 * PI * i) / (N - 1))));
+            }
+
+            f1 = Wn / 2.0f;
+            c1 = f1;
+            nhlf = (N + 1) / 2;
+            nhlf = nhlf - 1;
+            i1 = odd + 1;
+
+            /* Lowpass */
+
+            if (odd != 0)
+                b[0] = 2 * c1;
+
+            for (i = 0; i < nhlf; i++)
+            {
+                xn[i] = i + 0.5f * (1 - odd);
+            }
+
+            for (i = 0; i < nhlf; i++)
+            {
+                c[i] = PI * xn[i];
+            }
+
+            for (i = 0; i < nhlf; i++)
+            {
+                c3[i] = 2 * c1 * c[i];
+            }
+
+            /* b(i1:nhlf)=(sin(c3)./c) */
+            for (i = 1; i < (nhlf); i++)
+            {
+                b[i] = (float)Math.Sin(c3[i]) / c[i];
+            }
+
+            /* bb = real([b(nhlf:-1:i1) b(1:nhlf)].*wind(:)') */
+            for (i = 0, j = nhlf - 1; i < nhlf; i++, j--)
+            {
+                bb[i] = b[j];
+            }
+            for (i = nhlf, j = 0; i < Pr_L; i++, j++)
+            {
+                bb[i] = b[j];
+            }
+            for (i = 0; i < Pr_L; i++)
+            {
+                bb[i] = bb[i] * wind[i];
+            }
+
+            /* gain = abs(polyval(b,1)); */
+            for (i = 0; i < Pr_L; i++)
+            {
+                gain += bb[i];
+            }
+            /* b = b / gain */
+            for (i = 0; i < Pr_L; i++)
+            {
+                bb[i] = bb[i] / gain;
+            }
+
+            return bb;
+
+        }
 
 
 

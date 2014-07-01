@@ -57,6 +57,8 @@ namespace GuiSonar2
 
         static double BufferTime = 1.5;
 
+        float[] pru = new float[401];
+
         ObjBuffer bufferRpm = new ObjBuffer(Fs * BufferTime);
         ObjBuffer2 bufferObj = new ObjBuffer2();
         Stopwatch stopwatch = new Stopwatch();
@@ -65,6 +67,10 @@ namespace GuiSonar2
         public Form1()
         {
             InitializeComponent();
+
+            pru = fir1_400(400, 1 / 2.0f);
+            pru[0] = 4;
+
         }
         
         private void Form1_Load(object sender, EventArgs e)

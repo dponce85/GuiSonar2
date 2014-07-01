@@ -434,7 +434,7 @@ namespace GuiSonar2
             return R;
         }
 
-        private void testFind()
+       /* private void testFind()
         {
             float[] x = new float[] { 1, 2, 3, 4, 5 };
             float h = 3;
@@ -447,7 +447,7 @@ namespace GuiSonar2
             Console.WriteLine(s);
             
             // False, False, False, True, True, 
-        }
+        }*/
 
         private enum FindMethod
         {
