@@ -229,10 +229,22 @@ namespace GuiSonar2
         float[] moduloArrayComplejo(float[] Poli, int limite)
         {
             float modulo;
+            float[] tmp = new float[limite/2 ];
+            for (int i = 0; i < (limite - 1); i=i+2)
+            {
+                modulo = 2 * (float)Math.Sqrt(Poli[i] * Poli[i] + Poli[i + 1] * Poli[i + 1]);
+                tmp[i / 2] = modulo;
+            }
+            return tmp;
+        }
+
+        float[] AbsolutoArrayComplejo(float[] Poli, int limite)
+        {
+            float modulo;
             float[] tmp = new float[limite / 2];
             for (int i = 0; i < (limite - 1); i++)
             {
-                modulo = 2 * (float)Math.Sqrt(Poli[i] * Poli[i] + Poli[i + 1] * Poli[i + 1]);
+                modulo = (float)(Poli[i] * Poli[i] + Poli[i + 1] * Poli[i + 1]);
                 tmp[i / 2] = modulo;
             }
             return tmp;
@@ -251,6 +263,24 @@ namespace GuiSonar2
                 c++;
             }
             return tmp;
+        }
+
+        float[] blackman(int n)
+        {
+
+            int c = 0;
+            float i;
+            float[] tmp = new float[n];
+            float PI = (float)Math.PI;
+            c = 0;
+            for (i = 0; i <= n; i = i + 1 + (1) / (float)n)
+            {
+                tmp[c] = (float)(0.42 + 0.5 * Math.Sin(2*PI*i / (float)n - PI/ 2) - 0.08*Math.Sin(4 * PI * i / (float)n - PI / 2));
+                c++;
+            }
+            return tmp;
+        
+        
         }
 
         /* void deteccionRPM()
