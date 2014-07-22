@@ -410,28 +410,35 @@ namespace GuiSonar2
 
 
 
-        bool[] find(double[] A, float b, FindMethod fMeth)
+        int[] find(float[] A, float b, FindMethod fMeth)
         {
             int Alen = A.Length;
-            bool[] R = new bool[Alen];
+            List<int> R = new List<int>();
 
             switch (fMeth)
             {
                 case FindMethod.Greater:
                     for (int i = 0; i < Alen; i++)
-                        R[i] = A[i] > b;  break;
+                        if (A[i] > b)
+                            R.Add(i);  break;
                 case FindMethod.GreaterEqual:
                     for (int i = 0; i < Alen; i++)
-                        R[i] = A[i] >= b; break;
+                        if (A[i] >= b)
+                            R.Add(i); break;
                 case FindMethod.Less:
                     for (int i = 0; i < Alen; i++)
-                        R[i] = A[i] < b;  break;
+                        if (A[i] < b)
+                            R.Add(i);  break;
                 default:
                     for (int i = 0; i < Alen; i++)
-                        R[i] = A[i] <= b; break;
+                        if (A[i] <= b)
+                            R.Add(i); break;
             };
 
-            return R;
+            int[] ret = new int[R.Count];
+            R.CopyTo(ret);
+
+            return ret;
         }
 
        /* private void testFind()

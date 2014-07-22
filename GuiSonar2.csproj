@@ -41,6 +41,8 @@
     <Reference Include="OpenTK.GLControl, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Windows.Forms.DataVisualization.Design" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -71,13 +73,37 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ObjBuffer.cs" />
+    <Compile Include="PlotVars.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlotVars.Designer.cs">
+      <DependentUpon>PlotVars.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PrintVars.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PrintVars.Designer.cs">
+      <DependentUpon>PrintVars.cs</DependentUpon>
+    </Compile>
     <Compile Include="Process.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestBench.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Wavelets.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PlotVars.resx">
+      <DependentUpon>PlotVars.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PrintVars.resx">
+      <DependentUpon>PrintVars.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
