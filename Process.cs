@@ -438,6 +438,47 @@ namespace GuiSonar2
             // Resultado: 0, 1, 2, 3, 4, 5, 0
         }
 
+        int[] find(float[] A, float b, FindMethod fMeth)
+        {
+            int Alen = A.Length;
+            List<int> R = new List<int>();
+
+
+            switch (fMeth)
+            {
+                case FindMethod.Greater:
+                    for (int i = 0; i < Alen; i++)
+                        if (A[i] > b)
+                            R.Add(i); break;
+                case FindMethod.GreaterEqual:
+                    for (int i = 0; i < Alen; i++)
+                        if (A[i] >= b)
+                            R.Add(i); break;
+                case FindMethod.Less:
+                    for (int i = 0; i < Alen; i++)
+                        if (A[i] < b)
+                            R.Add(i); break;
+                default:
+                    for (int i = 0; i < Alen; i++)
+                        if (A[i] <= b)
+                            R.Add(i); break;
+            };
+
+
+            int[] ret = new int[R.Count];
+            R.CopyTo(ret);
+
+
+            return ret;
+        }
+
+        private enum FindMethod
+        {
+            Greater,
+            GreaterEqual,
+            Less,
+            LessEqual
+        }
 
         
     }

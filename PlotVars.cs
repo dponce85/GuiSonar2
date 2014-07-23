@@ -1,0 +1,44 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization;
+
+namespace GuiSonar2
+{
+    public partial class PlotVars : Form
+    {
+        float[] data;
+        public PlotVars(float[] data, string name)
+        {
+            InitializeComponent();
+            this.data = data;
+            this.Text = name;
+        }
+
+        private void PlotVars_Load(object sender, EventArgs e)
+        {
+            int targetLength = 1920*4;
+            chart1.Series[0].Points.Clear();
+
+            if (data.Length < targetLength)
+            {
+                for (int i = 0; i < data.Length; i++)
+                    chart1.Series[0].Points.AddY(data[i]);
+            }
+            else
+            {
+                double step = 1.0 * data.Length / targetLength;
+
+                for (double i = 0; i < targetLength; i += step)
+                    chart1.Series[0].Points.AddY(data[(int)i]);
+            }
+
+            chart1.Update();
+        }
+    }
+}
