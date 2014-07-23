@@ -68,9 +68,8 @@ namespace GuiSonar2
         {
             InitializeComponent();
 
-            pru = fir1_400(400, 1 / 2.0f);
-            pru[0] = 4;
-
+            // TestBench init
+            test01();
         }
         
         private void Form1_Load(object sender, EventArgs e)

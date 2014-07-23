@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Exocortex.DSP;
+
 namespace GuiSonar2
 {
     public partial class Form1
@@ -117,33 +117,19 @@ namespace GuiSonar2
             return B5;
         }
 
-        float[][] decima(float[][] BEN, float f0, float fsb, float sensi, float ct, float[] FAV, float boc, float tipve)
+        /*float[][] decima(float[][] BEN, float f0, float fsb, float sensi, float ct, float FAV, float boc, float tipve)
         {
             float[][] r = new float[6][];
             float[] B;
             float[] h;
-            float av;
-            float[] vb;
             float fs1 = 2 * 10 * f0;
             int M = (int)Math.Round(fsb / fs1);
             bool[] ip;
-            float[] fre;
             float k;
-            float pote = 0;
-            float[] FJ;
-            int NNF;
-            float[] FJ2;
-            float[] FJA;
-            float[] FJApos;
-            float delta1;
-            float f01;
-            int k1;
-            int pos;
-
             if (M > 1)
-            { h = fir1_400(400, 1.0f / M); }
+                h = fir1_400(400, 1.0f / M);
             else
-            { fs1 = fsb; }
+                fs1 = fsb;
 
             ip = find(ct, sensi, FindMethod.Less);
 
@@ -159,127 +145,15 @@ namespace GuiSonar2
                 if (M > 1)
                 {
                     B = filter(h, 1, B);
-                    int i = 0;
-                    Array.Resize(ref B, B.Length / M);
-                     while (i < B.Length / M)
-                     {
-                        B[i] = B[i*M];
-                        i++;
-                     }
-                }
-
-                pote = (float)Math.Ceiling(Math.Log(B.Length, 2.0));
-                NNF = (int)Math.Pow(2.0, pote);
-                av = B.Average();
-                for (int i = 0; i < B.Length; i++)
-                {B[i] = B[i] - av;}
-                /////////////////////////////////
-                if (tipve == 1)
-                {
-                    vb = new float[B.Length];
-                    for( int i=0; i <B.Length;i++ )
-                    {
-                      vb[i] = 1; 
-                    }
-                }
-                else if(tipve==2)
-                {
-                    vb = hann(B.Length);
-                }
-                else
-                {
-                    vb = blackman(B.Length);
-                }
-                // /////////////////
-                /* [FJ,fre]=freqz(B.*vb,1,2*NNF,fs1);
-                  FJ=abs(FJ);
-                  FJ=FJ.*FJ; */
-                FJ = new float[2*2*2*NNF];
-                FJ2 = new float[2 * NNF];
-
-                for(int i=0;i<2*B.Length;i++)
-                {
-                    FJ[2*i] = B[i]*vb[i];
-                }
-              
-                Fourier.FFT(FJ,2*2*2*NNF, FourierDirection.Forward);
-                FJ2 = moduloArrayComplejo(FJ, 2*2*NNF);
-                
-                fre = new float[2*NNF];
-                for(int i=0 ; i<(2*NNF) ;  i++  )
-                {
-                  fre[i] = (fs1/2.0f)*(i/(2.0f*NNF));
-                }
-                
-                ///////////////////
-
-                if (u == 1)
-                {
-                    for (int i = 0; i < FJ.Length; i++)
-                    {
-                        FJA[i] = FJ2[i];
-                    }
-                }
-
-                if (u > 1)
-                {
-                    for (int i = 0; i < FJ.Length; i++)
-                    {
-                        FJA[i] = FJ[i] + FJA[i];
-                    }
-
-                    k = k + 1;
-                
-                }
-
-            }
-
-            for (int i = 0; i < FJA.Length; i++)
-            {
-                FJA[i] = FJA[i] / k;            
-            }
-
-            if( boc==1 && (FAV.Length == FJA.Length) )
-            {
-                for (int i = 0; i < FAV.Length; i++)
-                {
-                    FJA[i] = (FAV[i] + FJA[i]) / 2;
                 }
             }
 
-            delta1 = fre[1];
-            k1 = (int)Math.Round(0.5 / delta1);
-
-            for (int i = 0; i < k1; i++)
-            {
-                FJA[i] = 0;
-            }
-
-            FJApos = FJA;
-            for (int i = 0; i < FJA.Length; i++)
-            {
-                if (FJApos[i] < 0)
-                { FJApos[i] = -FJApos[i]; }   
-            }
-
-            pos = indexMax(FJApos);
-            f01 =  fre[pos];
-            boc = 1;
-
-            r[0] = FJA;
-            r[1][0] = f01;
-            r[2] = fre;
-            r[3][0] = delta1;
-            r[4][0] = fs1;
-            r[5][0] = boc;
             return r;
         }
-        
+        */
 
-        private bool[] find(float[] x, int p, FindMethod findMethod)
-        {
-            throw new NotImplementedException();
-        }
+
+
 
 
         void dwt(float[] X, float[] hw0, float[] gw0, out float[] Xlp, out float[] Xhp)
@@ -292,7 +166,7 @@ namespace GuiSonar2
         {
             int retLen = X.Length / step;
             float[] ret = new float[retLen];
-            for (int i = 0, j = 0; i < X.Length; i += step)
+            for (int i = 0, j = 0; i < X.Length-1; i += step)
                 ret[j++] = X[i];
 
             return ret;
@@ -316,7 +190,7 @@ namespace GuiSonar2
 
             float fmin = 0;
             float ma;
-            int ik1, ik2, k1, k2;
+            float ik1, ik2, k1, k2;
             float lim1;
             float[] k = new float[2];
             float[] mak = new float[2];
@@ -339,116 +213,83 @@ namespace GuiSonar2
                 FV1[i] = 0;
             }
 
-            L  = FV1.Length ;
-            
-            ma = FV1.Length ;
+            L = FV1.Length;
+
+            ma = FV1.Length;
             pos = indexMax(FV1);
-            ik1 = pico(FV1, pos, L)[0][0];
-            ik2 = pico(FV1, pos, L)[1][0];
-            k1  = pico(FV1, pos, L)[2][0];
-            k2  = pico(FV1, pos, L)[3][0];
+            
+            PicoRet pRet = pico(FV1, pos, L);
+            ik1 = pRet.ik1;
+            ik2 = pRet.ik2;
+            k1 = pRet.k1;
+            k2 = pRet.k2;
 
-           tol = (int)Math.Round((ik2 - ik1 + 1)/2.0f);
-           k[0] = k1;
-           k[1] = k2;
-           lim1 = k.Min();
-           p1 = pos - tol;
-           p2 = pos - tol;
+            tol = (int)Math.Round((ik2 - ik1 + 1) / 2.0f);
+            k[0] = k1;
+            k[1] = k2;
+            lim1 = k.Min();
+            p1 = pos - tol;
+            p2 = pos - tol;
 
-           if (p1 < 0)
-           { p1 = 0; }
+            if (p1 < 0)
+            { p1 = 0; }
 
-           if (p2 > L)
-           { p2 = L-1; }
+            if (p2 > L)
+            { p2 = L - 1; }
 
-           //FV1(p1:p2) = 0  
-           for (int i = p1; i <= p2; i++)
-           {
-               FV1[i] = 0;
-           }
+            //FV1(p1:p2) = 0  
+            for (int i = p1; i <= p2; i++)
+            {
+                FV1[i] = 0;
+            }
 
-           Na = 10;
-           ivj[0] = pos;
-           mak[0] = ma;
+            Na = 10;
+            ivj[0] = pos;
+            mak[0] = ma;
 
-           ban = 0;
-           cont = 1;
+            ban = 0;
+            cont = 1;
 
-           List<double> abc = new List<double>();
-
+            // Example: List<> to Array
+            List<double> abc = new List<double>();
             abc.Add(13.4);
-
-            double[] empty;
+            double[] empty = new double[abc.Count];
             abc.CopyTo(empty, 0);
-            
 
-           while (ban == 0)
-           { 
-             ma = FV1.Max();    
-             pos = indexMax(FV1); 
-             
-             ivj[0] = ivj[0];
-             ivj[1] = pos;
-             mak[0] = mak[0];
-             mak[1] = ma;
-             cont=cont+1;
-      
-              if( cont==Na)
-              { ban=1;} 
-                        
-              p1=pos-tol;
-              p2=pos+tol;
-              if( p1<1)
-              { p1=1; }
-             
-              if( p2>L)
-              { p2=L;}
-                 
-              //FV1(p1:p2)=0;
-               for( int i=p1;i<=p2;i++)
-               {
-                 FV1[i] = 0;
-               }
-               
-              if(FV1.Sum()==0)
-              { ban=1;}
-           
-            }
-            
-               return r;
-        }
 
-        int[][] pico( float[] FV1, int pos, int L )
-        {
-            int[][] r = new int[4][];
-            int k1;  
-            int ik1;
-            int k2;
-            int ik2;
+            while (ban == 0)
+            {
+                ma = FV1.Max();
+                pos = indexMax(FV1);
 
-            k1=0;
-            ik1=pos;
+                ivj[0] = ivj[0];
+                ivj[1] = pos;
+                mak[0] = mak[0];
+                mak[1] = ma;
+                cont = cont + 1;
 
-            while( FV1[ik1]>FV1[ik1-1] && ik1>1)
-            {     k1=k1+1;
-                  ik1=ik1-1;
-            }      
+                if (cont == Na)
+                { ban = 1; }
 
-            ik1=ik1+1;
+                p1 = pos - tol;
+                p2 = pos + tol;
+                if (p1 < 1)
+                { p1 = 1; }
 
-            k2=0;
-            ik2=pos;
-            while( FV1[ik2]>FV1[ik2+1] && ik2<(L-2))
-            {       k2=k2+1;
-                  ik2=ik2+1;
+                if (p2 > L)
+                { p2 = L; }
+
+                //FV1(p1:p2)=0;
+                for (int i = p1; i <= p2; i++)
+                {
+                    FV1[i] = 0;
+                }
+
+                if (FV1.Sum() == 0)
+                { ban = 1; }
+
             }
 
-            ik2=ik2-1;
-
-            r[0][0] = ik1;
-            r[1][0] = ik2;
-            r[2][0] = k1;
-            r[3][0] = k2;
 
             return r;
         }
@@ -631,5 +472,45 @@ namespace GuiSonar2
             -0.00000000F,
             -0.00000000F
         };
+
+        PicoRet pico(float[] FV1, int pos, int L)
+        {
+            // function [ik1,ik2,k1,k2]=pico(FV1,pos,L)
+            int k1  = 0;
+            int ik1 = pos;
+
+            while ((FV1[ik1] > FV1[ik1 - 1]) && (ik1 > 2))
+            {
+                k1 = k1 + 1;
+                ik1 = ik1 - 1;
+            }
+
+            ik1=ik1+1;
+
+            int k2 = 0;
+            int ik2 = pos;
+            while ((FV1[ik2] > FV1[ik2 + 1]) && (ik2 < L - 2))
+            {
+                k2 = k2 + 1;
+                ik2 = ik2 + 1;
+            }
+
+            ik2 = ik2 - 1;
+                        
+            return new PicoRet(ik1, ik2, k1, k2);
+        }
+
+        struct PicoRet
+        {
+            public int ik1, ik2, k1, k2;
+            
+            public PicoRet(int ik1, int ik2, int k1, int k2)
+            { 
+                this.ik1 = ik1;
+                this.ik2 = ik2;
+                this.k1 = k1;
+                this.k2 = k2;
+            }
+        }
     }
 }
