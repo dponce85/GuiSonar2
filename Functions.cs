@@ -202,6 +202,7 @@ namespace GuiSonar2
             int tol;
             int Na;
             int[] ivj = new int[2];
+           
 
             nar = 0;
             fmin = 0.5f;
@@ -224,75 +225,69 @@ namespace GuiSonar2
             k1 = pRet.k1;
             k2 = pRet.k2;
 
-            tol = (int)Math.Round((ik2 - ik1 + 1) / 2.0f);
-            k[0] = k1;
-            k[1] = k2;
-            lim1 = k.Min();
-            p1 = pos - tol;
-            p2 = pos - tol;
+            tol = (int)Math.Round((ik2 - ik1 + 1)/2.0f);
+           k[0] = k1;
+           k[1] = k2;
+           lim1 = k.Min();
+           p1 = pos - tol;
+           p2 = pos - tol;
 
-            if (p1 < 0)
-            { p1 = 0; }
+           if (p1 < 0)
+           { p1 = 0; }
 
-            if (p2 > L)
-            { p2 = L - 1; }
+           if (p2 > L)
+           { p2 = L-1; }
 
-            //FV1(p1:p2) = 0  
-            for (int i = p1; i <= p2; i++)
-            {
-                FV1[i] = 0;
+           //FV1(p1:p2) = 0  
+           for (int i = p1; i <= p2; i++)
+           {
+               FV1[i] = 0;
+           }
+
+           Na = 10;
+           ivj[0] = pos;
+           mak[0] = ma;
+
+           ban = 0;
+           cont = 1;
+           
+
+           while (ban == 0)
+           { 
+             ma = FV1.Max();    
+             pos = indexMax(FV1); 
+             
+             ivj[0] = ivj[0];
+             ivj[1] = pos;
+             mak[0] = mak[0];
+             mak[1] = ma;
+             cont=cont+1;
+      
+              if( cont==Na)
+              { ban=1;} 
+                        
+              p1=pos-tol;
+              p2=pos+tol;
+              if( p1<1)
+              { p1=1; }
+             
+              if( p2>L)
+              { p2=L;}
+                 
+              //FV1(p1:p2)=0;
+               for( int i=p1;i<=p2;i++)
+               {
+                 FV1[i] = 0;
+               }
+               
+              if(FV1.Sum()==0)
+              { ban=1;}
+           
             }
 
-            Na = 10;
-            ivj[0] = pos;
-            mak[0] = ma;
-
-            ban = 0;
-            cont = 1;
-
-            // Example: List<> to Array
-            List<double> abc = new List<double>();
-            abc.Add(13.4);
-            double[] empty = new double[abc.Count];
-            abc.CopyTo(empty, 0);
-
-
-            while (ban == 0)
-            {
-                ma = FV1.Max();
-                pos = indexMax(FV1);
-
-                ivj[0] = ivj[0];
-                ivj[1] = pos;
-                mak[0] = mak[0];
-                mak[1] = ma;
-                cont = cont + 1;
-
-                if (cont == Na)
-                { ban = 1; }
-
-                p1 = pos - tol;
-                p2 = pos + tol;
-                if (p1 < 1)
-                { p1 = 1; }
-
-                if (p2 > L)
-                { p2 = L; }
-
-                //FV1(p1:p2)=0;
-                for (int i = p1; i <= p2; i++)
-                {
-                    FV1[i] = 0;
-                }
-
-                if (FV1.Sum() == 0)
-                { ban = 1; }
-
-            }
-
-
-            return r;
+           return r;
         }
+        
 
         float[] fir1_400(int N, float Wn)
         {
