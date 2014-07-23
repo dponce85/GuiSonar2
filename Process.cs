@@ -133,6 +133,24 @@ namespace GuiSonar2
             return index;
         }
 
+        int indexMax(int[] array)
+        {
+            int mayor;
+            int i;
+            int index = 0;
+            mayor = array[0]; /* asumimos primero es mayor */
+
+            for (i = 1; i < array.Length; i++) /* buscamos */
+            {
+                if (mayor <= array[i]) /* si hay otro mayor lo cambiamos */
+                {
+                    mayor = array[i];
+                    index = i;
+                }
+
+            }
+            return index;
+        }
         float SumaElementos(float[] Poli, int m, int n)
         {
             float s = 0;
@@ -443,7 +461,7 @@ namespace GuiSonar2
             int Alen = A.Length;
             List<int> R = new List<int>();
 
-
+                        
             switch (fMeth)
             {
                 case FindMethod.Greater:
