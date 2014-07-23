@@ -69,7 +69,7 @@ namespace GuiSonar2
             InitializeComponent();
 
             // TestBench init
-            test01();
+            test_freqban();
         }
         
         private void Form1_Load(object sender, EventArgs e)

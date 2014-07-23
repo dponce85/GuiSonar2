@@ -166,7 +166,7 @@ namespace GuiSonar2
         {
             int retLen = X.Length / step;
             float[] ret = new float[retLen];
-            for (int i = 0, j = 0; i < X.Length-1; i += step)
+            for (int i = 1, j = 0; i < X.Length; i += step)
                 ret[j++] = X[i];
 
             return ret;

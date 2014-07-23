@@ -17,12 +17,12 @@ namespace GuiSonar2
         {
             InitializeComponent();
             this.data = data;
-            this.Text = name;
+            this.Text = name + "   numel: " + data.Length;
         }
 
         private void PlotVars_Load(object sender, EventArgs e)
         {
-            int targetLength = 1920*4;
+            int targetLength = 1920*16;
             chart1.Series[0].Points.Clear();
 
             if (data.Length < targetLength)

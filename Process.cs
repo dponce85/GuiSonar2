@@ -378,8 +378,12 @@ namespace GuiSonar2
                 i1 = i;
                 tmp = 0.0f;
                 for (j = 0; j < lenB; j++)
-                {
-                    if (i1 >= 0 && i1 < lenA)
+                {       
+                    if (i1 < 0)
+                        tmp = tmp + (A[-i1] * B[j]);
+                    else if (i1 > lenA)
+                        tmp = tmp + (A[2 * lenA - i1 - 1] * B[j]);
+                    else // if (i1 >= 0 && i1 < lenA)
                         tmp = tmp + (A[i1] * B[j]);
 
                     i1 = i1 - 1;
