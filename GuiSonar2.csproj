@@ -69,6 +69,8 @@
     <Compile Include="Functions.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Interop.cs" />
+    <Compile Include="Managed.cs" />
     <Compile Include="ObjBuffer.cs" />
     <Compile Include="PlotVars.cs">
       <SubType>Form</SubType>
@@ -128,22 +130,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="down_green.png" />
+    <Content Include="libfftw3-3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libfftw3f-3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="pause_blue.png" />
     <Content Include="play_green.png" />
     <Content Include="record_gray.png" />
     <Content Include="record_red.png" />
     <Content Include="stop_red.png" />
     <Content Include="up_green.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FFTW\FFTWSharp\FFTWSharp.csproj">
-      <Project>{bea875b8-e28a-49c5-8e7e-6512da65f7e1}</Project>
-      <Name>FFTWSharp</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FFTW\FFTWtest\FFTWSharp_test.csproj">
-      <Project>{da20704b-23a7-41a4-b4e2-174a0fed5f3d}</Project>
-      <Name>FFTWSharp_test</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

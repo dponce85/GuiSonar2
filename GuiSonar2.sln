@@ -5,10 +5,6 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuiSonar2", "GuiSonar2.csproj", "{EE6119D2-F7D2-42A9-B46A-90FC0B204987}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFTWSharp", "..\FFTW\FFTWSharp\FFTWSharp.csproj", "{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFTWSharp_test", "..\FFTW\FFTWtest\FFTWSharp_test.csproj", "{DA20704B-23A7-41A4-B4E2-174A0FED5F3D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,26 +25,6 @@ Global
 		{EE6119D2-F7D2-42A9-B46A-90FC0B204987}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{EE6119D2-F7D2-42A9-B46A-90FC0B204987}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{EE6119D2-F7D2-42A9-B46A-90FC0B204987}.Release|x86.ActiveCfg = Release|Any CPU
-		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{BEA875B8-E28A-49C5-8E7E-6512DA65F7E1}.Release|x86.ActiveCfg = Release|Any CPU
-		{DA20704B-23A7-41A4-B4E2-174A0FED5F3D}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{DA20704B-23A7-41A4-B4E2-174A0FED5F3D}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{DA20704B-23A7-41A4-B4E2-174A0FED5F3D}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{DA20704B-23A7-41A4-B4E2-174A0FED5F3D}.Debug|x86.ActiveCfg = Debug|x86
-		{DA20704B-23A7-41A4-B4E2-174A0FED5F3D}.Debug|x86.Build.0 = Debug|x86
-		{DA20704B-23A7-41A4-B4E2-174A0FED5F3D}.Release|Any CPU.ActiveCfg = Release|x86
-		{DA20704B-23A7-41A4-B4E2-174A0FED5F3D}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{DA20704B-23A7-41A4-B4E2-174A0FED5F3D}.Release|Mixed Platforms.Build.0 = Release|x86
-		{DA20704B-23A7-41A4-B4E2-174A0FED5F3D}.Release|x86.ActiveCfg = Release|x86
-		{DA20704B-23A7-41A4-B4E2-174A0FED5F3D}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
