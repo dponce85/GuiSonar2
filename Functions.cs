@@ -58,6 +58,7 @@ namespace GuiSonar2
         float[][] envolvente1(float[] x, int N, float fc, float fs)
         {
             float[][] r = new float[2][];
+            r[1] = new float[1];
             int M;
             float[] y;
             float[] hb = Fir1Coeff;
@@ -75,10 +76,10 @@ namespace GuiSonar2
                 x[i] = x[i] - av;
             }
             y = conv(x, hb, ConvMethod.full);
-            float[] y2 = new float[y.Length % M];
-            for (int i = 0; i < y.Length; i = i + M)
+            float[] y2 = new float[y.Length / M];
+            for (int i = 0,j=0; i < y.Length; i = i + M,j++)
             {
-                y2[i] = y[i];
+                y2[j] = y[i];
             }
 
             av = y2.Average();
@@ -97,6 +98,7 @@ namespace GuiSonar2
         {
             float av;
             float[][] B5 = new float[9][];
+            B5[8] = new float[1];
             B5[0] = envolvente1(B51k, ord, fc1, fs1)[0];
             B5[1] = envolvente1(B52k, ord, fc1, fs1)[0];
             B5[2] = envolvente1(B53k, ord, fc1, fs1)[0];
@@ -117,43 +119,186 @@ namespace GuiSonar2
             return B5;
         }
 
-        /*float[][] decima(float[][] BEN, float f0, float fsb, float sensi, float ct, float FAV, float boc, float tipve)
+
+        float[][] decima(float[][] BEN, float f0, float fsb, float sensi, float[] ct, float[] FAV, float boc, float tipve)
         {
             float[][] r = new float[6][];
             float[] B;
-            float[] h;
+            float[] h=new float[401];
+            float av;
+            float[] vb;
             float fs1 = 2 * 10 * f0;
             int M = (int)Math.Round(fsb / fs1);
-            bool[] ip;
+            int[] ip;
+            float[] fre;
             float k;
+            float pote = 0;
+            float[] FJ;
+            int NNF;
+            
+            float[] FJA=new float[0];
+            float[] FJApos;
+            float delta1;
+            float f01;
+            int k1;
+            int pos;
+
             if (M > 1)
-                h = fir1_400(400, 1.0f / M);
+            { h = FIR400; }//fir1_400(400, 1.0f / M); }
             else
-                fs1 = fsb;
+            { fs1 = fsb; }
 
             ip = find(ct, sensi, FindMethod.Less);
 
             k = 1;
 
+            pote = (float)Math.Ceiling(Math.Log((BEN[0].Length * BEN.Length), 2.0f));
+            NNF = (int)Math.Pow(2.0, pote);
+            FJ = new float[2 * NNF];// FJ
+            fre = new float[2 * NNF];//fre
+
             for (int u = 0; u < ip.Length; u++)
             {
-                for (int f = 0; f < BEN.Size[0]; f++)
+                B = new float[BEN[0].Length];
+                for (int f = 0; f < BEN[0].Length; f++)
                 {
-                    B = BEN[f][ip[u]];
+                    
+                    B[f] = BEN[ip[u]][f];
                 }
 
                 if (M > 1)
                 {
-                    B = filter(h, 1, B);
+                    B = filter3(B,h);
+                    //PlotVar(B,"B=filter3", true);
+                    int i = 0;
+                    Array.Resize(ref B, B.Length / M);
+                    while (i < B.Length / M)
+                    {
+                        B[i] = B[i * M];
+                        i++;
+                    }
+                }
+                PlotVar(B,"B=filter3", true);
+                pote = (float)Math.Ceiling(Math.Log((BEN[0].Length*BEN.Length), 2.0f));
+                NNF = (int)Math.Pow(2.0, pote);
+                Array.Resize(ref FJ, 2 * NNF);
+                Array.Resize(ref fre, 2 * NNF);
+                               
+                av = B.Average();
+                for (int i = 0; i < B.Length; i++)
+                { B[i] = B[i] - av; }
+                /////////////////////////////////
+                if (tipve == 1)
+                {
+                    vb = new float[B.Length];
+                    for (int i = 0; i < B.Length; i++)
+                    {
+                        vb[i] = 1;
+                    }
+                }
+                else if (tipve == 2)
+                {
+                    vb = hann(B.Length);
+                }
+                else
+                {
+                    vb = blackman(B.Length);
+                }
+                // /////////////////
+                /* [FJ,fre]=freqz(B.*vb,1,2*NNF,fs1);
+                  FJ=abs(FJ);
+                  FJ=FJ.*FJ; */
+                float[] tempQZ= new float[B.Length];
+
+                for (int i = 0; i < B.Length; i++)
+                {   tempQZ[i] = B[i] * vb[i];  }
+
+               //FJ = freqz(tempQZ,1,2*NNF,fs1);
+               //FJ=FJ.*FJ
+               // FJ = new float[pruFJ.Length];
+                for (int i = 0; i < pruFJ.Length; i++)
+                { FJ[i] = pruFJ[i]; }
+                
+                fre = new float[2 * NNF]; // fre
+                for (int i = 0; i < (2 * NNF); i++)
+                {
+                    fre[i] = (fs1 / 2.0f) * (i / (2.0f * NNF));
+                }
+
+                ///////////////////
+                FJA = new float[FJ.Length];
+                
+                if (u == 0)
+                {
+                    for (int i = 0; i < FJ.Length; i++)
+                    {
+                        FJA[i] = FJ[i];
+                    }
+                }
+
+                if (u > 0)
+                {
+                    for (int i = 0; i < FJ.Length; i++)
+                    {
+                        FJA[i] = FJ[i] + FJA[i];
+                    }
+
+                    k = k + 1;
+
+                }
+
+            }
+
+            for (int i = 0; i < FJA.Length; i++)
+            {
+                FJA[i] = FJA[i] / k;
+            }
+
+            if (boc == 1 && (FAV.Length == FJA.Length))
+            {
+                for (int i = 0; i < FAV.Length; i++)
+                {
+                    FJA[i] = (FAV[i] + FJA[i]) / 2;
                 }
             }
 
+            delta1 = fre[1];
+            k1 = (int)Math.Round(0.5 / delta1);
+
+            for (int i = 0; i < k1; i++)
+            {
+                FJA[i] = 0;
+            }
+
+            //FJApos = FJA;
+            FJApos = new float[FJA.Length];
+            for (int i = 0; i < FJA.Length; i++)
+            {
+                FJApos[i] = FJA[i];
+            }
+
+            for (int i = 0; i < FJA.Length; i++)
+            {
+                if (FJApos[i] < 0)
+                { FJApos[i] = -FJApos[i]; }
+            }
+
+            pos = indexMax(FJApos);
+            f01 = fre[pos];
+            boc = 1;
+
+            r[0] = FJA;
+            r[1] = new float[1];
+            r[1][0] = f01;
+            r[2] = fre;
+            r[3] = new float[1];
+            r[3][0] = delta1;
+            r[4] = new float[1];
+            r[4][0] = fs1;
+            r[5] = new float[1];
+            r[5][0] = boc;
             return r;
-        }
-        */
-
-
-
+        }        
 
 
         void dwt(float[] X, float[] hw0, float[] gw0, out float[] Xlp, out float[] Xhp)
@@ -182,7 +327,7 @@ namespace GuiSonar2
 
         }
 
-        /*float[][] detecarm33(float[] FV, float f0, float delta, float[] f, float sensar)
+        float[][] detecarm33(float[] FV, float f0, float delta, float[] f, float sensar)
         {
             float[][] r = new float[7][];
             float[] FV2 = new float[FV.Length];
@@ -193,7 +338,7 @@ namespace GuiSonar2
             float ik1, ik2, k1, k2;
             float lim1;
             float[] k = new float[2];
-            float[] mak = new float[2];
+            //float[] mak = new float[2];
             float ban = 0;
             int p1, p2;
             int nar = 0;
@@ -201,29 +346,42 @@ namespace GuiSonar2
             int pos = 0;
             int tol;
             int Na;
-            int[] ivj = new int[2];
+            //int[] ivj = new int[2];
             int[] ivj1 ;
             float j0;
             int pp;
             float[]  mkk;
+            float[] FC;
+            float[] FD;
+            float[] por;
+            float[] makf;
+            float[] makfpor;
+            float[] frecarm;
+            float f00;
             List<int> ikk1 = new List<int>();
+            List<int> ivj = new List<int>();
+            List<float> mak = new List<float>();
             List<int> ivv2 = new List<int>();
+           
             List<float> mak1 = new List<float>();
 
                       
             nar = 0;
             fmin = 0.5f;
             k1 = (int)Math.Round(fmin / delta);
-            FV1 = FV;
+
+            //FV1 = FV;
+            FV1 = new float[FV.Length];
+            for (int i = 0; i < FV.Length; i++)
+            { FV1[i] = FV[i];  }
+
             //FV1(1:K1) = 0;
             for (int i = 0; i < k1; i++)
-            {
-                FV1[i] = 0;
-            }
+            { FV1[i] = 0;  }
 
             L = FV1.Length;
 
-            ma = FV1.Length;
+            ma = FV1.Max();
             pos = indexMax(FV1);
             
             PicoRet pRet = pico(FV1, pos, L);
@@ -232,12 +390,12 @@ namespace GuiSonar2
             k1 = pRet.k1;
             k2 = pRet.k2;
 
-            tol = (int)Math.Round((ik2 - ik1 + 1)/2.0f);
+            tol = (int)Math.Round((ik2 - ik1 )/2.0f);
            k[0] = k1;
            k[1] = k2;
            lim1 = k.Min();
            p1 = pos - tol;
-           p2 = pos - tol;
+           p2 = pos + tol;
 
            if (p1 < 0)
            { p1 = 0; }
@@ -252,8 +410,9 @@ namespace GuiSonar2
            }
 
            Na = 10;
-           ivj[0] = pos;
-           mak[0] = ma;
+           
+           ivj.Add(pos);
+           mak.Add(ma);
 
            ban = 0;
            cont = 1;
@@ -262,12 +421,10 @@ namespace GuiSonar2
            while (ban == 0)
            { 
              ma = FV1.Max();    
-             pos = indexMax(FV1); 
-             
-             ivj[0] = ivj[0];
-             ivj[1] = pos;
-             mak[0] = mak[0];
-             mak[1] = ma;
+             pos = indexMax(FV1);
+
+             ivj.Insert(ivj.Count, pos);
+             mak.Insert(mak.Count, ma);
              cont=cont+1;
       
               if( cont==Na)
@@ -275,11 +432,11 @@ namespace GuiSonar2
                         
               p1=pos-tol;
               p2=pos+tol;
-              if( p1<1)
-              { p1=1; }
+              if( p1<0)
+              { p1=0; }
              
-              if( p2>L)
-              { p2=L;}
+              if( p2>(L-1))
+              { p2=(L-1);}
                  
               //FV1(p1:p2)=0;
                for( int i=p1;i<=p2;i++)
@@ -293,79 +450,90 @@ namespace GuiSonar2
             }//fin de ban==0
 
 
-            ivj1=ivj;
-            //ikk1=[];
-            //mak1=[];
-            for(int u=0; u<ivj.Length;u++)
-            {
-                ma=ivj1.Max();
-                pos = indexMax(ivj1);
-                ikk1.Insert(0,(int)ma); //ikk1=[ma ikk1];  
-                mak1.Insert(mak1.Count,mak[pos]); //mak1=[mak1 mak(pos)]; 
-                ivj1[pos]=0;    
-            }    
+            ivj1=new int[ivj.Count];//ivj1 = ivj
+            for (int i = 0; i < ivj.Count; i++)
+            { ivj1[i] = ivj[i]; }
+                //ikk1=[];
+                //mak1=[];
+                for (int u = 0; u < ivj1.Length; u++)
+                {
+                    ma = ivj1.Max();
+                    pos = indexMax(ivj1);
+                    ikk1.Insert(0, (int)ma); //ikk1=[ma ikk1];  
+                    if (mak1.Count == 0) mak1.Add(mak[pos]);
+                    else mak1.Insert(mak1.Count, mak[pos]); //mak1=[mak1 mak(pos)]; 
+                    ivj1[pos] = 0;
+                }    
             
             //ikk1
             float[]  v = new float[ikk1.Count];
-            float[][] zz = new float[Na][];
+            int[][] zz = new int[Na][];
             int[] sar;
             float[]  bak = new float[ikk1.Count];
             int posm;
             int posp1;
-            int posp;
+            float posp;
             float nr;
             int ne;
             int nd;
-            for(int u=1;u<ikk1.Count; u++)
+            for (int i = 0; i < Na; i++)
             {
-                j0=f[ikk1[u]];
-                ban=0;    
-                pp=1;
-                mkk= new float[mak1.Count];  
-                mkk = mak1.ToArray();
+                zz[i] = new int[ikk1.Count];
+            }
 
-                while( pp<=mkk.Length)
-                {     
-                    ma = mkk.Max();
-                    posm = indexMax(mkk);
-                    mkk[posm] = 0;
-                    posp1 = ikk1[posm];
+                for (int u = 0; u < ikk1.Count; u++)
+                {
+                    j0 = f[ikk1[u]];
+                    ban = 0;
+                    pp = 1;//contador
+                    mkk = new float[mak1.Count];
+                    mkk = mak1.ToArray();
 
-                      posp1=ikk1[posm];
-                      posp=(int)f[ikk1[posm]];
-                      nr=posp/j0;
-                      ne=(int)Math.Floor(nr);
-                      nd=(int)Math.Floor((nr-ne)*10);                    
-                      if ( (ne>=1 && nd==9) || (ne>=1 && nd==0) )               
-                      {     v[u]=v[u]+1;
-                          zz[(int)v[u]][u]=posp1;                           
-                          bak[u]=bak[u]+FV[posp1];                                    
-                      }     
-                      pp=pp+1;
-               }
-            }    
+                    while (pp <= mkk.Length)
+                    {
+                        //ma = mkk.Max();
+                        posm = indexMax(mkk);
+                        mkk[posm] = 0;
+                        posp1 = ikk1[posm];
+                        posp = f[ikk1[posm]];
+                        nr = posp / j0;
+                        ne = (int)Math.Floor(nr);
+                        nd = (int)Math.Floor((nr - ne) * 10);
+                        if ((ne >= 1 && nd == 9) || (ne >= 1 && nd == 0))
+                        {   
+                            zz[(int)v[u]][u] = posp1;
+                            bak[u] = bak[u] + FV[posp1];
+                            v[u] = v[u] + 1;
+                            
+                        }
+                        pp = pp + 1;
+                    }
+                }    
 
             pos = indexMax(bak);
 
-            float[] ivv = new float[Na];
+            int[] ivv = new int[Na];
             
             for(int i=0;i<Na;i++)
             { ivv[i] = zz[i][pos]; }
              
             int[] ip1;
-            int[] iv2;
-            ip1 = find(ivv,0,FindMethod.Greater);
             
+            ip1 = find(ivv,0,FindMethod.Greater);
+            int[] iv2=new int[ip1.Length];
             for(int i=0; i< ip1.Length ;i++ )
             {
-              iv2[i] = (int)ivv[ip1[i]];
+              iv2[i] = ivv[ip1[i]];
             }
             //iv2
 
             Array.Resize(ref ivj1,iv2.Length);
-            ivj1=iv2;
-            ikk1.Clear(); // ikk1=[];
-            mak1.Clear(); //mak1=[];
+            //ivj1=iv2;
+            ivj1 = new int[iv2.Length];
+            for(int i = 0; i < iv2.Length; i++)
+            { ivj1[i] = iv2[i]; }
+              ikk1.Clear(); // ikk1=[];
+              mak1.Clear(); //mak1=[];
             
             
             for(int u= 0 ;u< ivj1.Length ;u++)
@@ -397,64 +565,151 @@ namespace GuiSonar2
               sar[i] = (int)Math.Round(fg[i]/fg[0]);
             }
    
-            int j=1;
-            
-            while (j<=sar.Length)
+            int j=0;
+            int[] ip;
+            int[] sar2 = new int[sar.Length];
+            int[] sar_ip;
+            List<int> ivvsar = new List<int>();
+            while (j<sar.Length)
             {     
+                for(int i=0;i<sar2.Length;i++)
+                {sar2[i] = sar[i] - sar[j];}
+                ip=find(sar2,0,FindMethod.Equal);
+                sar_ip = new int[ip.Length]; 
+                for(int i=0;i<ip.Length;i++)
+                {
+                  sar_ip[i] = sar[ip[i]];
+                }
+                pos = indexMax(sar_ip);
+                j=j+ip.Length;
+                if (ivvsar.Count == 0) ivvsar.Add(iv2[ip[pos]]);
+                else ivvsar.Insert(ivvsar.Count, iv2[ip[pos]]);
                 
-                ip=find(sar-sar(j)==0);
-                   [ma,pos]=max(sar(ip));
-                   j=j+length(ip);
-                   ivv=[ivv iv2(ip(pos))];
             } 
   
-            iv2=[]; 
-            iv2=ivv;       
+           
+            //iv2=[]; 
+            //iv2=ivv;       
+            Array.Resize(ref iv2,ivvsar.Count);
+            
+            for (int i = 0; i < ivvsar.Count; i++)
+            { iv2[i] = ivvsar[i]; }            
 
             //iv2
 
-            if length(iv2)>1
-               FC=zeros(length(FV),1);
-               FC(iv2)=FV(iv2);
-               FD=FV(iv2);
-               [ma,pos]=max(FD);
-               FD(pos)=0;
-               [ma]=max(FD);
-               por=FC*100/ma;
-               iv2=[];
-               iv2=find(por>=sensar);
-            end;   
+            if( iv2.Length >1 )
+              { 
+               FC = new float[FV.Length];//FC=zeros(length(FV),1);
+               for(int i = 0;i< iv2.Length; i++)               
+               {
+               FC[iv2[i]]=FV[iv2[i]];
+               }
+               FD = new float[iv2.Length];
+               for(int i=0;i<iv2.Length ;i++)
+               {
+                 FD[i]=FV[iv2[i]];     
+               } 
+               
+               pos=indexMax(FD);
+               FD[pos]=0;
+               ma=FD.Max();
+               por=new float[FC.Length]; 
+               for(int i=0; i<FC.Length;i++)
+               {
+		       por[i]=(FC[i]*100.0f)/(float)ma;	
+               } 
+               
+               
+               int[] iv2_pre;
+               iv2_pre = find(por,sensar,FindMethod.GreaterEqual);
+               Array.Resize(ref iv2,iv2_pre.Length);
+               //iv2=find(por>=sensar);
+             }   
 
-            fg=[];
-            sar=[];
-            fg=f(iv2);
-            sar=round(fg/fg(1));
-            makf=FV(iv2);
-            makf=floor(makf*100000)/100000;
-            makfpor=makf*100/max(makf);
-            makfpor=floor(makfpor*100000)/100000;
+            Array.Resize(ref fg, iv2.Length);
+              for(int i=0;i<iv2.Length;i++)
+              {
+                fg[i]=f[iv2[i]];
+              }
 
-            FV2=zeros(length(FV),1);
-            FV2(iv2)=FV(iv2);
-            nar=length(iv2);
-            frecarm=floor((iv2*delta*60)*100000)/100000;
-            f00=min(frecarm);
 
+              Array.Resize(ref sar, fg.Length);
+              for (int i = 0; i < fg.Length; i++)
+              {
+                  sar[i] = (int)Math.Round(fg[i] / fg[0]);
+              }
+              makf = new float[iv2.Length];
+              for (int i = 0; i < iv2.Length; i++)
+              {
+                  makf[i] = FV[iv2[i]];
+              }
+              //makf=floor(makf*100000)/100000;
+              for (int i = 0; i < makf.Length; i++)
+              {
+                  makf[i] = (float)Math.Floor(makf[i] * 100000) / 100000.0f;
+              }
+
+              for (int i = 0; i < makf.Length; i++)
+              {
+                  makf[i] = ((float)Math.Floor(makf[i] * 100000))/100000.0f;
+              }
+              //makfpor = makf * 100 / max(makf);
+              makfpor = new float[makf.Length];
+              for (int i = 0; i < makf.Length; i++)
+              {
+                  makfpor[i] = ((float)Math.Floor(makf[i] * 100))/ makf.Max();
+              }
+
+              //makfpor=floor(makfpor*100000)/100000;
+              for (int i = 0; i < iv2.Length; i++)
+              {
+                  makfpor[i] = ((float)Math.Floor(makfpor[i]*100000))/100000.0f;
+              }
+              // FV2=zeros(length(FV),1);
+
+              for (int i=0; i < iv2.Length; i++)
+              {
+                  FV2[iv2[i]] = FV[iv2[i]];
+              }
+                  
+              nar=iv2.Length;
+              frecarm = new float[iv2.Length];
+
+              for (int i = 0; i < iv2.Length; i++)
+              {
+                  frecarm[i] =((float)Math.Floor((iv2[i]*delta*60)*100000))/100000.0f;
+              }
+
+              //f00=min(frecarm);
+              //if (frecarm.Length > 1)
+              //    f00 = frecarm.Min();
+             // else
+              f00 = frecarm.Min();
+              r[0] = FV2;
+              r[1] = new float[1];
+              r[1][0] = f00;
+              r[2] = new float[1];
+              r[2][0] = nar;
+              r[3] = frecarm;
+              r[4]= Array.ConvertAll(sar, element => (float)element);
+              r[5] = makf;
+              r[6] = makfpor;
            return r;
         }
-        */
-
-        float[] fir1_400(int N, float Wn)
+            float[] fir400(float Wn)
         {
+            
 
-            const float PI = (float)Math.PI;
-            int Pr_L = N + 1;
-            /* FIR filter
-            Return an array of 1 x 256
-            */
+            float PI = (float)Math.PI;
+            int L = 400; /* Filter length */
+            int Pr_L = L;
+            int M = 64;
+
+            int N = L - 2;
 
             int odd, i, j, nhlf, i1;
             float f1, gain, c1;
+
             float[] wind = new float[Pr_L];
             float[] xn = new float[Pr_L / 2];
             float[] b = new float[Pr_L / 2];
@@ -462,22 +717,20 @@ namespace GuiSonar2
             float[] c3 = new float[Pr_L / 2];
             float[] bb = new float[Pr_L];
 
-            //bb = (double *) malloc(sizeof(double) * Pr_L);
 
-            gain = 0;
-            N = N + 1;
+            gain = 0.0f;
+            // N = N + 1;
             odd = N - (N / 2) * 2; /* odd = rem(N,2) */
 
             /*wind = hamming(N);*/
             for (i = 0; i < Pr_L; i++)
             {
-                wind[i] = (float)(0.54 - (0.46 * Math.Cos((2 * PI * i) / (N - 1))));
+                wind[i] = (float)(0.54 - 0.46 * Math.Cos((2 * PI * i) / (N - 1)));
             }
 
             f1 = Wn / 2.0f;
             c1 = f1;
-            nhlf = (N + 1) / 2;
-            nhlf = nhlf - 1;
+            nhlf = N / 2; // (N + 1) / 2;
             i1 = odd + 1;
 
             /* Lowpass */
@@ -501,7 +754,7 @@ namespace GuiSonar2
             }
 
             /* b(i1:nhlf)=(sin(c3)./c) */
-            for (i = 1; i < (nhlf); i++)
+            for (i = 0; i < nhlf; i++)
             {
                 b[i] = (float)Math.Sin(c3[i]) / c[i];
             }
@@ -511,7 +764,7 @@ namespace GuiSonar2
             {
                 bb[i] = b[j];
             }
-            for (i = nhlf, j = 0; i < Pr_L; i++, j++)
+            for (i = nhlf-1, j = 0; i < Pr_L; i++, j++)
             {
                 bb[i] = b[j];
             }
@@ -626,36 +879,37 @@ namespace GuiSonar2
         PicoRet pico(float[] FV1, int pos, int L)
         {
             // function [ik1,ik2,k1,k2]=pico(FV1,pos,L)
-            int k1  = 0;
+            int k1 = 0;
             int ik1 = pos;
 
-            while ((FV1[ik1] > FV1[ik1 - 1]) && (ik1 > 2))
+            while ((FV1[ik1] > FV1[ik1 - 1]) && (ik1 > 1))
             {
                 k1 = k1 + 1;
                 ik1 = ik1 - 1;
             }
 
-            ik1=ik1+1;
+            ik1 = ik1 + 1;
 
-            int k2 = 0;
+            
+           int k2 = 0;
             int ik2 = pos;
-            while ((FV1[ik2] > FV1[ik2 + 1]) && (ik2 < L - 2))
+            while ((FV1[ik2] > FV1[ik2 + 1]) && (ik2 <( L - 3)))
             {
                 k2 = k2 + 1;
                 ik2 = ik2 + 1;
             }
 
             ik2 = ik2 - 1;
-                        
+
             return new PicoRet(ik1, ik2, k1, k2);
         }
 
         struct PicoRet
         {
             public int ik1, ik2, k1, k2;
-            
+
             public PicoRet(int ik1, int ik2, int k1, int k2)
-            { 
+            {
                 this.ik1 = ik1;
                 this.ik2 = ik2;
                 this.k1 = k1;

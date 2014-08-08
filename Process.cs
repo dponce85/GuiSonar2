@@ -119,7 +119,7 @@ namespace GuiSonar2
             float mayor;
             int i;
             int index = 0;
-            mayor = array[0]; /* asumimos primero es mayor */
+            mayor = array[0]; /* asumimos ultimo es mayor */
 
             for (i = 1; i < array.Length; i++) /* buscamos */
             {
@@ -399,7 +399,7 @@ namespace GuiSonar2
                 {       
                     if (i1 < 0)
                         tmp = tmp + (A[-i1] * B[j]);
-                    else if (i1 > lenA)
+                    else if (i1 >= lenA)
                         tmp = tmp + (A[2 * lenA - i1 - 1] * B[j]);
                     else // if (i1 >= 0 && i1 < lenA)
                         tmp = tmp + (A[i1] * B[j]);
@@ -412,6 +412,137 @@ namespace GuiSonar2
             return C;
         }
 
+        float[] conv2(float[] B, float[] H)
+        {
+            int nconv, xconv, hconv;
+            int i, j, i1;
+            float tmp;
+            float[] C;
+            int lenA = B.Length;
+            int lenB = H.Length;
+
+            //allocated convolution array   
+            nconv = lenA + lenB - 1;
+            xconv = (lenA > lenB) ? lenA : lenB;
+            hconv = (lenA < lenB) ? lenA : lenB;
+
+            C = new float[xconv];
+
+
+
+            //convolution process
+            for (i = 0; i < nconv; i++)
+            {
+                i1 = i;
+                tmp = 0.0f;
+                for (j = 0; j < lenB; j++)
+                {
+                    if (i1 < 0)
+                        tmp = tmp + (B[-i1] * H[j]);
+                    else if (i1 >= lenA)
+                        tmp = tmp + (B[2 * lenA - i1 - 1] * H[j]);
+                    else // if (i1 >= 0 && i1 < lenA)
+                        tmp = tmp + (B[i1] * H[j]);
+
+                    i1 = i1 - 1;
+
+                    int dc_ini = (int)(hconv / 2);
+                    int dc_end = hconv - (int)(hconv / 2) - 1;
+
+                    if ((i >= dc_ini) && (i <= xconv - dc_end + dc_ini))
+                        C[i - dc_ini] = tmp;
+                }
+            }
+            return C;
+        }
+
+        float[] filter3(float[] B, float[] H)
+        {
+            //int nconv, xconv, hconv;
+            int k, j, min, max;
+            float tmp;
+            float[] C;
+            float[] tmp2;
+            int lenB= B.Length;
+            int lenH = H.Length;
+
+            //allocated convolution array   
+            
+            C = new float[lenB];
+
+            tmp2 = new float[2 * H.Length];
+
+            for (int c = 0; c < lenH; c++)
+            {
+                tmp2[c] = H[c];
+            }
+
+            for (int c = lenH; c < 2 * lenH; c++)
+            {
+                tmp2[c] = 0.0f; 
+            }
+            
+            //convolution process
+            for (k = 0; k <lenB ; k++)
+            {
+                tmp = 0.0f;
+                min = (1 > (k - lenH)) ? 1 : (k - lenH);
+                max = (k < lenB) ? k : lenB;
+                for (j = min; j < max; j++)
+                { 
+                   tmp = tmp +B[j]*tmp2[k-j];
+                }
+            C[k] = tmp;
+            }
+            return C;
+        }
+
+        float[] filter2(float[] B, float[] H)
+        {
+            int nconv, xconv, hconv;
+            int i, j, i1;
+            float tmp;
+            float[] C;
+            int lenB = B.Length;
+            int lenH = H.Length * 2;
+
+            //allocated convolution array   
+            nconv = lenB + lenH - 1;
+            xconv = (lenB > lenH) ? lenB : lenH;
+            hconv = (lenB < lenH) ? lenB : lenH;
+
+            C = new float[xconv];
+
+
+
+            //convolution process
+            for (i = 0; i < nconv; i++)
+            {
+                i1 = i;
+                tmp = 0.0f;
+                for (j = 0; j < lenH; j++)
+                {
+                    int k = j - lenH;
+                    float Hk = (k >= 0 ? H[j] : 0);
+
+                    if (i1 < 0)
+                        tmp = tmp + (B[-i1] * Hk);
+                    else if (i1 >= lenB)
+                        tmp = tmp + (B[2 * lenB - i1 - 1] * Hk);
+                    else // if (i1 >= 0 && i1 < lenA)
+                        tmp = tmp + (B[i1] * Hk);
+
+                    i1 = i1 - 1;
+
+                    int dc_ini = (int)(hconv / 2);
+                    int dc_end = hconv - (int)(hconv / 2) - 1;
+
+                    if ((i >= dc_ini) && (i <= xconv - dc_end + dc_ini))
+                        C[i - dc_ini] = tmp;
+                }
+            }
+            return C;
+        }
 
         float[] conv(float[] A, float[] B, int offset, int count, int step)
         {
@@ -480,11 +611,58 @@ namespace GuiSonar2
                     for (int i = 0; i < Alen; i++)
                         if (A[i] < b)
                             R.Add(i); break;
+                case FindMethod.Equal:
+                    for (int i = 0; i < Alen; i++)
+                        if (A[i] == b)
+                            R.Add(i); break;
                 default:
                     for (int i = 0; i < Alen; i++)
                         if (A[i] <= b)
                             R.Add(i); break;
             };
+
+
+
+
+            int[] ret = new int[R.Count];
+            R.CopyTo(ret);
+
+
+            return ret;
+        }
+
+
+        int[] find(int[] A, int b, FindMethod fMeth)
+        {
+            int Alen = A.Length;
+            List<int> R = new List<int>();
+
+
+            switch (fMeth)
+            {
+                case FindMethod.Greater:
+                    for (int i = 0; i < Alen; i++)
+                        if (A[i] > b)
+                            R.Add(i); break;
+                case FindMethod.GreaterEqual:
+                    for (int i = 0; i < Alen; i++)
+                        if (A[i] >= b)
+                            R.Add(i); break;
+                case FindMethod.Less:
+                    for (int i = 0; i < Alen; i++)
+                        if (A[i] < b)
+                            R.Add(i); break;
+                case FindMethod.Equal:
+                    for (int i = 0; i < Alen; i++)
+                        if (A[i] == b)
+                            R.Add(i); break;
+                default:
+                    for (int i = 0; i < Alen; i++)
+                        if (A[i] <= b)
+                            R.Add(i); break;
+            };
+
+
 
 
             int[] ret = new int[R.Count];
@@ -499,7 +677,8 @@ namespace GuiSonar2
             Greater,
             GreaterEqual,
             Less,
-            LessEqual
+            LessEqual,
+            Equal
         }
 
         

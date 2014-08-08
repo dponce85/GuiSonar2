@@ -67,9 +67,76 @@ namespace GuiSonar2
         public Form1()
         {
             InitializeComponent();
+            float[] h   = new float[] { 4, 3, 2, 1, 0};
+            float[] B   = new float[] { 1, 2, 3, 4, 5,6,7,8,9,10 };
+            
+            //float[] R;
+            //// test de envolventeban /////
+            
+            /*float[][] prup = new float[9][];
+            float[] pru8=new float[1];
+            float[] B51k = new float[12440];//{ 0.1320f ,  0.9421f ,   0.9561f ,   0.5752f ,   0.0598f };
+
+            for (int i = 0; i < B51k.Length; i++)
+            { B51k[i] = i /(float)B51k.Length; }
+                
+            int ord = 100;
+            float fc1 = 100;
+            float fs1 = 1378.1f;
+            pru8[0]= envolventeban(B51k, B51k, B51k, B51k, B51k, B51k, B51k, B51k, ord, fc1, fs1)[8][0];
+            PrintVar(pru8, "pru8");*/
+            //// fin de test  ///////
+
+            /////  test de detecarm33  ////
+            
+            /* float[] FJA = new float[1024];
+            float[] fre = new float[1024];
+            float f01 = 1.4274f;
+            float delta1 = 0.0150f;
+            int   sensar = 25;
+            float[] f00 =new float[1];
+             FJA = PruebaDetecarm;
+            //for (int i = 0; i < FJA.Length; i++)
+            //{   if (i >= FJA.Length / 2) FJA[i] = ((FJA.Length - i) * 0.9f) / (float)(FJA.Length/2);
+            //    else FJA[i] = (i * 0.9f) / (float)(FJA.Length/2);
+            //}
+
+            for (int i = 0; i < fre.Length; i++)
+            {  fre[i] = i * 0.15f; }
+
+            f00[0] = detecarm33(FJA, f01, delta1, fre, sensar)[1][0];
+            PrintVar(f00, "f00");*/
+
+            ////// test  de  Decima   /////
+            float[][] pruBEN = new float[8][];
+            float[][] OutDec = new float[6][];
+            float f0  = 7.0335f;
+            float fsb = 229.6875f;
+            float sensi = 30;
+            float[] ct = new float[] {257f,89f,18f,203f,7f,8f,8f,7f};
+            float boc=1;
+            float tipve=3;
+
+            pruBEN[0] = PruebaBEN0;
+            pruBEN[1] = PruebaBEN1;
+            pruBEN[2] = PruebaBEN2;
+            pruBEN[3] = PruebaBEN3;
+            pruBEN[4] = PruebaBEN4;
+            pruBEN[5] = PruebaBEN5;
+            pruBEN[6] = PruebaBEN6;
+            pruBEN[7] = PruebaBEN7;
+                        
+            OutDec[0]=decima(pruBEN,f0,fsb,sensi, ct,pruebaFJA,boc,tipve)[0];
+            PrintVar(OutDec[0], "FJA");
+            ////FIN DECIMA
+
+
+
+           // R = filter3(B, h);
+           // PrintVar(R, "prup");
 
             // TestBench init
-            test_freqban();
+            // test_freqban();
         }
         
         private void Form1_Load(object sender, EventArgs e)
