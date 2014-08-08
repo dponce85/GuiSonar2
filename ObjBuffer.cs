@@ -24,7 +24,6 @@ namespace GuiSonar2
             wrPos = 0;
 
             bufferData = new float[bufferLen];
-
         }
         Stopwatch stopwatch = new Stopwatch();
 
