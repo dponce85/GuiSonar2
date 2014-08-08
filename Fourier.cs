@@ -9,35 +9,35 @@ namespace GuiSonar2
 {
     public static class Fourier
     {
-        private static double[] tempInputSignal = new double[44100];
-        private static double[] tempOutputSignal = new double[44100];
+        private static double[] b_inputReal = new double[44100];
+        private static double[] b_outputReal = new double[44100];
 
         public enum FourierDirection : int { Forward, Backwards };
 
-        public static void freqz(double[] inputSignal, double[] outputSignal)
+        public static void freqz(double[] inputReal, double[] outputReal)
         {
             // FFTW test
-            int n_in = Math.Min(inputSignal.Length, outputSignal.Length);
-            int n_out = 2 * outputSignal.Length;
+            int n_in = Math.Min(inputReal.Length, outputReal.Length);
+            int n_out = 2 * outputReal.Length;
 
 
             // Check if tempSignal has enough space, grow if necessary
-            if (tempOutputSignal.Length < n_out)
+            if (b_outputReal.Length < n_out)
             {
-                tempInputSignal = new double[n_out];
-                tempOutputSignal = new double[n_out];
+                b_inputReal = new double[n_out];
+                b_outputReal = new double[n_out];
             }
             else
             {
-                // Block copy input signal
-                Array.Clear(tempInputSignal, 0, n_out);
-                Buffer.BlockCopy(inputSignal, 0, tempInputSignal, 0, n_in * sizeof(double));
+                // Block copy input signal                
+                Buffer.BlockCopy(inputReal, 0, b_inputReal, 0, n_in * sizeof(double));
+                Array.Clear(b_inputReal, n_in, n_out);
             }
 
 
             // get handles and pin arrays so the GC doesn't move them
-            GCHandle hdin = GCHandle.Alloc(tempInputSignal, GCHandleType.Pinned);
-            GCHandle hdout = GCHandle.Alloc(tempOutputSignal, GCHandleType.Pinned);
+            GCHandle hdin = GCHandle.Alloc(b_inputReal, GCHandleType.Pinned);
+            GCHandle hdout = GCHandle.Alloc(b_outputReal, GCHandleType.Pinned);
 
 
             // create a few test transforms
@@ -59,34 +59,34 @@ namespace GuiSonar2
 
 
             // Copy valid samples
-            Buffer.BlockCopy(tempOutputSignal, 0, outputSignal, 0, n_in * sizeof(double));            
+            Buffer.BlockCopy(b_outputReal, 0, outputReal, 0, n_in * sizeof(double));            
         }
 
 
-        public static void freqc(double[] inputSignal, double[] outputSignal)
+        public static void freqc(double[] input_Real, double[] output_HalfComplex)
         {
             // FFTW test
-            int n_in = Math.Min(inputSignal.Length, outputSignal.Length);
-            int n_out = outputSignal.Length;
+            int n_in = Math.Min(input_Real.Length, output_HalfComplex.Length);
+            int n_out = output_HalfComplex.Length;
 
 
             // Check if tempSignal has enough space, grow if necessary
-            if (tempOutputSignal.Length < n_out)
+            if (b_outputReal.Length < n_out)
             {
-                tempInputSignal = new double[n_out];
-                tempOutputSignal = new double[n_out];
+                b_inputReal = new double[n_out];
+                b_outputReal = new double[n_out];
             }
             else
             {
                 // Block copy input signal
-                Array.Clear(tempInputSignal, 0, n_out);
-                Buffer.BlockCopy(inputSignal, 0, tempInputSignal, 0, n_in * sizeof(double));
+                Array.Clear(b_inputReal, 0, n_out);
+                Buffer.BlockCopy(input_Real, 0, b_inputReal, 0, n_in * sizeof(double));
             }
 
 
             // get handles and pin arrays so the GC doesn't move them
-            GCHandle hdin = GCHandle.Alloc(tempInputSignal, GCHandleType.Pinned);
-            GCHandle hdout = GCHandle.Alloc(tempOutputSignal, GCHandleType.Pinned);
+            GCHandle hdin = GCHandle.Alloc(b_inputReal, GCHandleType.Pinned);
+            GCHandle hdout = GCHandle.Alloc(b_outputReal, GCHandleType.Pinned);
 
 
             // create a few test transforms
@@ -108,7 +108,7 @@ namespace GuiSonar2
 
 
             // Copy valid samples
-            Buffer.BlockCopy(tempOutputSignal, 0, outputSignal, 0, n_out * sizeof(double));
+            Buffer.BlockCopy(b_outputReal, 0, output_HalfComplex, 0, n_out * sizeof(double));
         }
 
 
@@ -118,25 +118,19 @@ namespace GuiSonar2
             int n = inputSignal.Length;
 
 
-            // Check if tempSignal has enough space, grow if necessary
-            if (tempOutputSignal.Length < n)
-                tempOutputSignal = new double[n];
-
-
             // Check if outputSignal has enough space
             if (outputSignal.Length < n)
-                throw new ArgumentException("Output array doesn't have enough space");
+                throw new ArgumentException("Input and output lengths don't match");
 
 
             // Alias for double arrays
             var din = inputSignal;
-            var dtmp = tempOutputSignal;
             var dout = outputSignal;
 
 
             // get handles and pin arrays so the GC doesn't move them
             GCHandle hdin = GCHandle.Alloc(din, GCHandleType.Pinned);
-            GCHandle hdout = GCHandle.Alloc(dtmp, GCHandleType.Pinned);
+            GCHandle hdout = GCHandle.Alloc(dout, GCHandleType.Pinned);
 
 
             // create a few test transforms
@@ -155,10 +149,6 @@ namespace GuiSonar2
             fftwf.destroy_plan(fplan6);
             hdin.Free();
             hdout.Free();
-
-
-            // Copy valid samples
-            Buffer.BlockCopy(dtmp, 0, dout, 0, n * sizeof(double));
         }
 
         public static void FFT(double[] input_Real, double[] output_HalfComplex)
