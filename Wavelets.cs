@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Exocortex.DSP;
 
 namespace GuiSonar2
 {
@@ -29,33 +28,64 @@ namespace GuiSonar2
             return wp;
         }
 
-        float freqban(WaveletPacket wp)
+        void freqban(WaveletPacket wp)
         {
+            /*
+
             // function [F51,F52,F53,F54,F55,F56,F57,F58,f,delta]=freqban(B51,B52,B53,B54,B55,B56,B57,B58,fsb)
 
-            float fsb = wp.fs1;
+            // Pack vars
+            var B5x = new float[][]{
+                wp.B51, wp.B52, 
+                wp.B53, wp.B54, 
+                wp.B55, wp.B56, 
+                wp.B57, wp.B58
+            };
 
-            Fourier.RFFT(wp.B51, FourierDirection.Forward);
-            Fourier.RFFT(wp.B52, FourierDirection.Forward);
-            Fourier.RFFT(wp.B53, FourierDirection.Forward);
-            Fourier.RFFT(wp.B54, FourierDirection.Forward);
-            Fourier.RFFT(wp.B55, FourierDirection.Forward);
-            Fourier.RFFT(wp.B56, FourierDirection.Forward);
-            Fourier.RFFT(wp.B57, FourierDirection.Forward);
-            Fourier.RFFT(wp.B58, FourierDirection.Forward);
 
-            float[][] B5x = new float[][] { wp.B51, wp.B52, wp.B53, wp.B54, wp.B55, wp.B56, wp.B57, wp.B58 };
-            for (int ax = 0; ax < B5x.Length; ax++)
+            // Create array in memory to perform complex FFT
+            int sLength = wp.B51.Length;
+            int tLength = nextpow2(sLength);
+            var tSignal = new float[tLength];
+
+            // For every band
+            for (int j = 0; j < 8; j++)
             {
-                for (int i = 0; i < 10; i++)
-                    B5x[ax][i] = 0;
+                // Copy signal coefficients to array
+                for (int i = 0; i < sLength; i++)
+                    tSignal[i].Re = B5x[j][i];
 
-                abs(B5x[ax]);
-                divide(B5x[ax], max(B5x[ax]));
+
+                // Recommended: hann window over signal coeff!
+
+                
+                // Perform FFT
+                Fourier.FFT(tSignal, FourierDirection.Forward);
+
+                
+                // Recommended: compensate hann window attn! (x2)
+
+
+                // Clear first 10 coeff (some kind of highpass)
+                for (int i = 0; i < 10; i++)
+                    tSignal[i] = new ComplexF(0, 0);
+
+                // Normalize
+                B5x[j] = normalize(tSignal);
             }
 
-            float delta = fsb / (2 * wp.B51.Length);
-            return delta;
+
+            // Save vars
+            wp.B51 = B5x[0];
+            wp.B52 = B5x[1];
+            wp.B53 = B5x[2];
+            wp.B54 = B5x[3];
+            wp.B55 = B5x[4];
+            wp.B56 = B5x[5];
+            wp.B57 = B5x[6];
+            wp.B58 = B5x[7];
+
+            */
         }
 
 
@@ -87,11 +117,23 @@ namespace GuiSonar2
 
 
 
-        void abs(float[] data)
+        /*float[] normalize(float[] data)
         {
-            for (int i = 0; i < data.Length; i++)
-                data[i] = Math.Abs(data[i]);
-        }
+            float[] ret = new float[data.Length / 2];            
+
+            // Get Abs. value
+            for (int i = 0; i < ret.Length; i++)
+                ret[i] = data[i].GetModulus();
+
+            // Get Max value
+            float maxRet = max(ret);
+
+            // Normalize
+            for (int i = 0; i < ret.Length; i++)
+                ret[i] = ret[i] / maxRet;
+
+            return ret;
+        }*/
 
         float max(float[] data)
         {
@@ -124,7 +166,7 @@ namespace GuiSonar2
         }
     }
 
-    public struct WaveletPacket
+    public class WaveletPacket
     {
         public float[] B51;
         public float[] B52;

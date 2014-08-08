@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Exocortex.DSP;
 
 namespace GuiSonar2
 {
@@ -223,7 +222,7 @@ namespace GuiSonar2
             wSamp = ProductoPunto(samples, window, 1 / wndAtt);//ventaneamos la señal(512)
             wSamp2 = IniFFT_Pin(wSamp);//duplicamos la ventana y completamos con ceros(1024)
 
-            Fourier.FFT(wSamp2, NFFT, FourierDirection.Forward);
+            // Fourier.FFT(wSamp2, NFFT, FourierDirection.Forward);
             fSamp = ProductoEscalar(wSamp2, 1 / (float)L);
             afSamp = new float[NFFT / 2];
             afSamp = moduloArrayComplejo(fSamp, NFFT);

@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -53,11 +54,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Complex.cs" />
-    <Compile Include="ComplexArray.cs" />
-    <Compile Include="ComplexF.cs" />
-    <Compile Include="ComplexMath.cs" />
-    <Compile Include="ComplexStats.cs" />
     <Compile Include="FirCoeff.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,8 +63,9 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Fourier.cs" />
-    <Compile Include="FourierDirection.cs" />
+    <Compile Include="Fourier.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Functions.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -137,6 +134,16 @@
     <Content Include="record_red.png" />
     <Content Include="stop_red.png" />
     <Content Include="up_green.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FFTW\FFTWSharp\FFTWSharp.csproj">
+      <Project>{bea875b8-e28a-49c5-8e7e-6512da65f7e1}</Project>
+      <Name>FFTWSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FFTW\FFTWtest\FFTWSharp_test.csproj">
+      <Project>{da20704b-23a7-41a4-b4e2-174a0fed5f3d}</Project>
+      <Name>FFTWSharp_test</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

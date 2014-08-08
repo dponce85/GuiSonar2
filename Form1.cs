@@ -10,9 +10,8 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using OpenTK;
 using cswavrec;
-using Exocortex.DSP;
 using System.Diagnostics;
-
+using System.Runtime.InteropServices;
 
 namespace GuiSonar2
 {
@@ -69,7 +68,30 @@ namespace GuiSonar2
             InitializeComponent();
 
             // TestBench init
-            test_freqban();
+            // test_FFT3(1123);
+
+
+            // Equals!
+            // xx = abs(fft(B51,length(B51)*2)); figure(100), 
+            // plot(xx(1:end/2), 'r'), 
+            
+            // [F51,f]=freqz(B51,1,length(B51),fsb);            
+            // plot(abs(F51))
+
+            int n = 1123;
+            var din = new double[n];
+
+            // Fill with sawtooth-like signal
+            for (int i = 0; i < n; i++)
+                din[i] = i % 50;
+
+            
+            PlotVar(din, "Input, before freqz");
+            
+            var dout = new double[din.Length];
+            freqz(din, dout);
+
+            PlotVar(dout, "Output, after freqz");
         }
         
         private void Form1_Load(object sender, EventArgs e)
@@ -175,6 +197,7 @@ namespace GuiSonar2
         public void makeFFT()
         {
             sndData = sndIn.getWaveData();   //----->adquirir audio desde tarjeta de sonido 
+
             if (sndDataNorm == null)
                 sndDataNorm = new float[sndData.Length];
             if (asdOlapFrame == null)
@@ -191,6 +214,8 @@ namespace GuiSonar2
 
             widthDEP = this.pictureBox1.ClientSize.Width;
         }
+
+        
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {

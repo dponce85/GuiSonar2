@@ -5,6 +5,9 @@ using System.Text;
 using System.Windows.Forms;
 using System.Threading;
 using System.IO;
+using System.Diagnostics;
+using FFTWSharp;
+using System.Runtime.InteropServices;
 
 namespace GuiSonar2
 {
@@ -109,8 +112,13 @@ namespace GuiSonar2
             wp.B58 = LoadTxtVar("B58");
             wp.fs1 = 229.6875f;
 
-            // Do process and pack vars
-            float delta = freqban(wp);
+
+            // Do process
+            freqban(wp);
+            float delta = wp.fs1 / (2 * wp.B51.Length);
+
+
+            // Pack vars
             var F5x = new float[][]{
                 wp.B51, wp.B52, 
                 wp.B53, wp.B54, 
@@ -143,6 +151,186 @@ namespace GuiSonar2
             }
         }
 
+        
+
+        public void test_FFT1(int n) // double[] inputSignal
+        {
+            // FFTW test
+            // int n = inputSignal.Length;
+
+            // and two more for double FFTW            
+            var din = new double[n * 2];
+            var dout = new double[n * 2];
+
+            // get handles and pin arrays so the GC doesn't move them
+            GCHandle hdin = GCHandle.Alloc(din, GCHandleType.Pinned);
+            GCHandle hdout = GCHandle.Alloc(dout, GCHandleType.Pinned);
+
+            // create a few test transforms
+            IntPtr fplan5 = fftw.dft_1d(n, hdin.AddrOfPinnedObject(), hdout.AddrOfPinnedObject(),
+                fftw_direction.Forward, fftw_flags.Estimate);
+
+            // Fill with sawtooth-like signal
+            for (int i = 0; i < n * 2; i = i + 2)
+            {
+                din[i] = i % 50;
+                din[i + 1] = 0;
+            }
+
+            // Tests a single plan, displaying results
+            fftwf.execute(fplan5);
+
+            // Free resources
+            fftwf.destroy_plan(fplan5);
+            hdin.Free();
+            hdout.Free();
+
+            // System.Console.WriteLine("Testing managed interface:\n");
+            PlotVar(din, "Input, before FFT");
+            PlotVar(dout, "Output, before FFT");
+
+            // mplan.Execute();
+
+            PlotVar(din, "Input, after FFT");
+            PlotVar(dout, "Output, after FFT");
+        }
+
+        public void test_FFT2(int n)
+        {
+            // FFTW test
+            // int n = inputSignal.Length;
+
+            // and two more for double FFTW            
+            var din = new double[n];
+            var dout = new double[n];
+
+
+            // get handles and pin arrays so the GC doesn't move them
+            GCHandle hdin = GCHandle.Alloc(din, GCHandleType.Pinned);
+            GCHandle hdout = GCHandle.Alloc(dout, GCHandleType.Pinned);
+
+
+            // create a few test transforms
+            IntPtr fplan6 = fftw.r2r_1d(n,
+                hdin.AddrOfPinnedObject(),
+                hdout.AddrOfPinnedObject(),
+                fftw_kind.R2HC,
+                fftw_flags.Estimate);
+
+
+            // Fill with sawtooth-like signal
+            for (int i = 0; i < n; i++)
+                din[i] = i % 50;
+
+
+            // System.Console.WriteLine("Testing managed interface:\n");
+            PlotVar(din, "Input, before FFT");
+            PlotVar(dout, "Output, before FFT");
+
+
+            // Tests a single plan, displaying results
+            fftwf.execute(fplan6);
+
+
+            // System.Console.WriteLine("Testing managed interface:\n");
+            PlotVar(din, "Input, after FFT");
+            PlotVar(dout, "Output, after FFT");
+
+
+
+            // create a few test transforms
+            IntPtr fplan7 = fftw.r2r_1d(n,
+                hdout.AddrOfPinnedObject(),
+                hdin.AddrOfPinnedObject(),
+                fftw_kind.HC2R,
+                fftw_flags.Estimate);
+
+
+            // Tests a single plan, displaying results
+            fftwf.execute(fplan7);
+
+
+            // Free resources
+            fftwf.destroy_plan(fplan6);
+            hdin.Free();
+            hdout.Free();
+
+
+            // mplan.Execute();
+            PlotVar(dout, "Input, after iFFT");
+            PlotVar(din, "Output, after iFFT");
+        }
+
+
+        public void test_FFT3(int n)
+        {
+            // FFTW test
+            // int n = inputSignal.Length;
+
+            // and two more for double FFTW            
+            var din = new double[n];
+            var dout = new double[2*n];
+
+
+            // get handles and pin arrays so the GC doesn't move them
+            GCHandle hdin = GCHandle.Alloc(din, GCHandleType.Pinned);
+            GCHandle hdout = GCHandle.Alloc(dout, GCHandleType.Pinned);
+
+
+            // create a few test transforms
+            IntPtr fplan6 = fftw.dft_r2c_1d(n,
+                hdin.AddrOfPinnedObject(),
+                hdout.AddrOfPinnedObject(),                
+                fftw_flags.Estimate);
+
+
+            // Fill with sawtooth-like signal
+            for (int i = 0; i < n; i++)
+                din[i] = i % 50;
+
+
+            // System.Console.WriteLine("Testing managed interface:\n");
+            PlotVar(din, "Input, before FFT");
+            PlotVar(dout, "Output, before FFT");
+
+
+            // Tests a single plan, displaying results
+            fftwf.execute(fplan6);
+
+
+            // System.Console.WriteLine("Testing managed interface:\n");
+            PlotVar(din, "Input, after FFT");
+            PlotVar(dout, "Output, after FFT");
+
+
+
+            // create a few test transforms
+            IntPtr fplan7 = fftw.dft_c2r_1d(n,
+                hdout.AddrOfPinnedObject(),
+                hdin.AddrOfPinnedObject(),                
+                fftw_flags.Estimate);
+
+
+            // Tests a single plan, displaying results
+            fftwf.execute(fplan7);
+
+
+            // Free resources
+            fftwf.destroy_plan(fplan6);
+            fftwf.destroy_plan(fplan7);
+            hdin.Free();
+            hdout.Free();
+
+
+            // mplan.Execute();
+            PlotVar(dout, "Input, after iFFT");
+            PlotVar(din, "Output, after iFFT");
+        }
+
+
+
+
+
         float[] LoadTxtVar(string strVarName)
         {
             string FileName = strVarName;
@@ -173,6 +361,19 @@ namespace GuiSonar2
         }
 
         void PlotVar(float[] xx, string name, params bool[] isModal)
+        {
+            var pVars = new PlotVars(xx, name);
+            if (isModal.Length == 1)
+            {
+                if (isModal[0])
+                    pVars.ShowDialog();
+                else
+                    pVars.Show();
+            }
+            else
+                pVars.Show();
+        }
+        void PlotVar(double[] xx, string name, params bool[] isModal)
         {
             var pVars = new PlotVars(xx, name);
             if (isModal.Length == 1)

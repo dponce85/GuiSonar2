@@ -12,8 +12,19 @@ namespace GuiSonar2
 {
     public partial class PlotVars : Form
     {
-        float[] data;
+        double[] data;
+
         public PlotVars(float[] data, string name)
+        {
+            InitializeComponent();
+
+            this.data = new double[data.Length];
+            for (int i = 0; i < data.Length; i++)
+                this.data[i] = data[i];
+            this.Text = name + "   numel: " + data.Length;
+        }
+
+        public PlotVars(double[] data, string name)
         {
             InitializeComponent();
             this.data = data;
