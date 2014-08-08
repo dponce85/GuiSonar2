@@ -7,17 +7,17 @@ using FFTWSharp;
 
 namespace GuiSonar2
 {
-    public partial class Form1
+    public static class Fourier
     {
-        private double[] tempInputSignal = new double[44100];
-        private double[] tempOutputSignal = new double[44100];
+        private static double[] tempInputSignal = new double[44100];
+        private static double[] tempOutputSignal = new double[44100];
 
         public enum FourierDirection : int { Forward, Backwards };
 
-        public void freqz(double[] inputSignal, double[] outputSignal)
+        public static void freqz(double[] inputSignal, double[] outputSignal)
         {
             // FFTW test
-            int n_in  = inputSignal.Length;
+            int n_in = Math.Min(inputSignal.Length, outputSignal.Length);
             int n_out = 2 * outputSignal.Length;
 
 
@@ -26,24 +26,18 @@ namespace GuiSonar2
             {
                 tempInputSignal = new double[n_out];
                 tempOutputSignal = new double[n_out];
-            }            
-
-
-            // Alias for double arrays
-            var din = inputSignal;
-            var dout_tmp = tempOutputSignal;
-            var dout = outputSignal;
-            var din_tmp = tempInputSignal;
-
-            
-            // Block copy input signal
-            Array.Clear(din_tmp, 0, din_tmp.Length);
-            Buffer.BlockCopy(din, 0, din_tmp, 0, n_in * sizeof(double));
+            }
+            else
+            {
+                // Block copy input signal
+                Array.Clear(tempInputSignal, 0, n_out);
+                Buffer.BlockCopy(inputSignal, 0, tempInputSignal, 0, n_in * sizeof(double));
+            }
 
 
             // get handles and pin arrays so the GC doesn't move them
-            GCHandle hdin = GCHandle.Alloc(din_tmp, GCHandleType.Pinned);
-            GCHandle hdout = GCHandle.Alloc(dout_tmp, GCHandleType.Pinned);
+            GCHandle hdin = GCHandle.Alloc(tempInputSignal, GCHandleType.Pinned);
+            GCHandle hdout = GCHandle.Alloc(tempOutputSignal, GCHandleType.Pinned);
 
 
             // create a few test transforms
@@ -65,10 +59,60 @@ namespace GuiSonar2
 
 
             // Copy valid samples
-            Buffer.BlockCopy(dout_tmp, 0, dout, 0, n_out / 2 * sizeof(double));            
+            Buffer.BlockCopy(tempOutputSignal, 0, outputSignal, 0, n_in * sizeof(double));            
         }
 
-        private void genFFT(double[] inputSignal, double[] outputSignal, FourierDirection fd)
+
+        public static void freqc(double[] inputSignal, double[] outputSignal)
+        {
+            // FFTW test
+            int n_in = Math.Min(inputSignal.Length, outputSignal.Length);
+            int n_out = outputSignal.Length;
+
+
+            // Check if tempSignal has enough space, grow if necessary
+            if (tempOutputSignal.Length < n_out)
+            {
+                tempInputSignal = new double[n_out];
+                tempOutputSignal = new double[n_out];
+            }
+            else
+            {
+                // Block copy input signal
+                Array.Clear(tempInputSignal, 0, n_out);
+                Buffer.BlockCopy(inputSignal, 0, tempInputSignal, 0, n_in * sizeof(double));
+            }
+
+
+            // get handles and pin arrays so the GC doesn't move them
+            GCHandle hdin = GCHandle.Alloc(tempInputSignal, GCHandleType.Pinned);
+            GCHandle hdout = GCHandle.Alloc(tempOutputSignal, GCHandleType.Pinned);
+
+
+            // create a few test transforms
+            IntPtr fplan6 = fftw.r2r_1d(n_out,
+                hdin.AddrOfPinnedObject(),
+                hdout.AddrOfPinnedObject(),
+                fftw_kind.R2HC,
+                fftw_flags.Estimate);
+
+
+            // Tests a single plan, displaying results
+            fftwf.execute(fplan6);
+
+
+            // Free resources
+            fftwf.destroy_plan(fplan6);
+            hdin.Free();
+            hdout.Free();
+
+
+            // Copy valid samples
+            Buffer.BlockCopy(tempOutputSignal, 0, outputSignal, 0, n_out * sizeof(double));
+        }
+
+
+        private static void genRFFT(double[] inputSignal, double[] outputSignal, FourierDirection fd)
         {
             // FFTW test
             int n = inputSignal.Length;
@@ -117,14 +161,14 @@ namespace GuiSonar2
             Buffer.BlockCopy(dtmp, 0, dout, 0, n * sizeof(double));
         }
 
-        public void FFT(double[] input_Real, double[] output_HalfComplex)
+        public static void FFT(double[] input_Real, double[] output_HalfComplex)
         {
-            genFFT(input_Real, output_HalfComplex, FourierDirection.Forward);
+            genRFFT(input_Real, output_HalfComplex, FourierDirection.Forward);
         }
 
-        public void IFFT(double[] input_HalfComplex, double[] output_Real)
+        public static void IFFT(double[] input_HalfComplex, double[] output_Real)
         {
-            genFFT(input_HalfComplex, output_Real, FourierDirection.Backwards);
+            genRFFT(input_HalfComplex, output_Real, FourierDirection.Backwards);
         }
     }
 }

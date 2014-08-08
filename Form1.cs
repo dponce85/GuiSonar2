@@ -89,7 +89,7 @@ namespace GuiSonar2
             PlotVar(din, "Input, before freqz");
             
             var dout = new double[din.Length];
-            freqz(din, dout);
+            Fourier.freqz(din, dout);
 
             PlotVar(dout, "Output, after freqz");
         }
