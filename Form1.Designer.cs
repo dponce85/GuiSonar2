@@ -101,8 +101,6 @@
             this.textBox1K = new System.Windows.Forms.TextBox();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.glControlTicks = new OpenTK.GLControl();
-            this.glControlBar1 = new OpenTK.GLControl();
-            this.glControlBar2 = new OpenTK.GLControl();
             this.panel1.SuspendLayout();
             this.panel5.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -661,6 +659,7 @@
             this.pictureBox1.Size = new System.Drawing.Size(512, 426);
             this.pictureBox1.TabIndex = 15;
             this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
             this.pictureBox1.Resize += new System.EventHandler(this.pictureBox1_Resize);
             // 
@@ -910,39 +909,12 @@
             this.glControlTicks.Load += new System.EventHandler(this.glControlTicks_Load);
             this.glControlTicks.Paint += new System.Windows.Forms.PaintEventHandler(this.glControlTicks_Paint);
             // 
-            // glControlBar1
-            // 
-            this.glControlBar1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.glControlBar1.BackColor = System.Drawing.Color.Red;
-            this.glControlBar1.Location = new System.Drawing.Point(422, 105);
-            this.glControlBar1.Name = "glControlBar1";
-            this.glControlBar1.Size = new System.Drawing.Size(1, 400);
-            this.glControlBar1.TabIndex = 19;
-            this.glControlBar1.VSync = false;
-            this.glControlBar1.Load += new System.EventHandler(this.glControlBar1_Load);
-            this.glControlBar1.Paint += new System.Windows.Forms.PaintEventHandler(this.glControlBar1_Paint);
-            // 
-            // glControlBar2
-            // 
-            this.glControlBar2.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.glControlBar2.BackColor = System.Drawing.Color.Red;
-            this.glControlBar2.ForeColor = System.Drawing.Color.Red;
-            this.glControlBar2.Location = new System.Drawing.Point(395, 105);
-            this.glControlBar2.Name = "glControlBar2";
-            this.glControlBar2.Size = new System.Drawing.Size(1, 400);
-            this.glControlBar2.TabIndex = 20;
-            this.glControlBar2.VSync = false;
-            this.glControlBar2.Load += new System.EventHandler(this.glControlBar2_Load);
-            this.glControlBar2.Paint += new System.Windows.Forms.PaintEventHandler(this.glControlBar2_Paint);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Desktop;
             this.ClientSize = new System.Drawing.Size(732, 613);
-            this.Controls.Add(this.glControlBar2);
-            this.Controls.Add(this.glControlBar1);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.panel1);
             this.MinimumSize = new System.Drawing.Size(190, 640);
@@ -1045,8 +1017,6 @@
         private System.Windows.Forms.TextBox textBox4K;
         private System.Windows.Forms.TextBox textBox1K;
         private OpenTK.GLControl glControl2;
-        private OpenTK.GLControl glControlBar1;
-        private OpenTK.GLControl glControlBar2;
         private OpenTK.GLControl glControlTicks;
     }
 }

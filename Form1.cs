@@ -24,8 +24,7 @@ namespace GuiSonar2
 
         bool GL1loaded = false;
         bool GL2loaded = false;
-        bool GL1Barloaded = false;
-        bool GL2Barloaded = false;
+      
 
         int speed = 1;
         int y, y2;
@@ -66,32 +65,76 @@ namespace GuiSonar2
         public Form1()
         {
             InitializeComponent();
+            //float[] h = new float[] { 4, 3, 2, 1, 0 };
+            //float[] B = new float[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+            //float[] R;
+            //// test de envolventeban /////
+
+            /*float[][] prup = new float[9][];
+            float[] pru8;
+           
+            float[] B51k = new float[12440];//{ 0.1320f ,  0.9421f ,   0.9561f ,   0.5752f ,   0.0598f };
+
+            for (int i = 0; i < B51k.Length; i++)
+            { B51k[i] = (i+1) /(float)B51k.Length; }
+                
+            int ord = 100;
+            float fc1 = 100;
+            float fs1 = 1378.1f;
+            pru8= envolventeban(B51k, B51k, B51k, B51k, B51k, B51k, B51k, B51k, ord, fc1, fs1)[0];
+            //PlotVar(pru8,"pru8",true);
+            PrintVar(pru8, "pru8");*/
+            //// fin de test  ///////
+
+            /////  test de detecarm33  ////
+
+            /* float[] FJA = new float[1024];
+            float[] fre = new float[1024];
+            float f01 = 1.4274f;
+            float delta1 = 0.0150f;
+            int   sensar = 25;
+            float[] f00 =new float[1];
+             FJA = PruebaDetecarm;
+            //for (int i = 0; i < FJA.Length; i++)
+            //{   if (i >= FJA.Length / 2) FJA[i] = ((FJA.Length - i) * 0.9f) / (float)(FJA.Length/2);
+            //    else FJA[i] = (i * 0.9f) / (float)(FJA.Length/2);
+            //}
+
+            for (int i = 0; i < fre.Length; i++)
+            {  fre[i] = i * 0.15f; }
+
+            f00[0] = detecarm33(FJA, f01, delta1, fre, sensar)[1][0];
+            PrintVar(f00, "f00");*/
+
+            ////// test  de  Decima   /////
+            /*float[][] pruBEN = new float[8][];
+            float[][] OutDec = new float[6][];
+            float f0 = 7.0335f;
+            float fsb = 229.6875f;
+            float sensi = 30;
+            float[] ct = new float[] { 257f, 89f, 18f, 203f, 7f, 8f, 8f, 7f };
+            float boc = 1;
+            float tipve = 3;
+
+            pruBEN[0] = PruebaBEN0;
+            pruBEN[1] = PruebaBEN1;
+            pruBEN[2] = PruebaBEN2;
+            pruBEN[3] = PruebaBEN3;
+            pruBEN[4] = PruebaBEN4;
+            pruBEN[5] = PruebaBEN5;
+            pruBEN[6] = PruebaBEN6;
+            pruBEN[7] = PruebaBEN7;
+
+            OutDec[0] = decima(pruBEN, f0, fsb, sensi, ct, pruebaFJA, boc, tipve)[0];
+            PrintVar(OutDec[0], "FJA");*/
+            ////FIN DECIMA
+            
+            // R = filter3(B, h);
+            // PrintVar(R, "prup");
 
             // TestBench init
-            // test_FFT3(1123);
-
-
-            // Equals!
-            // xx = abs(fft(B51,length(B51)*2)); figure(100), 
-            // plot(xx(1:end/2), 'r'), 
-            
-            // [F51,f]=freqz(B51,1,length(B51),fsb);            
-            // plot(abs(F51))
-
-            int n = 1123;
-            var din = new double[n];
-
-            // Fill with sawtooth-like signal
-            for (int i = 0; i < n; i++)
-                din[i] = i % 50;
-
-            
-            PlotVar(din, "Input, before freqz");
-            
-            var dout = new double[din.Length];
-            //freqz(din, dout);
-            FFT(din, dout);
-            PlotVar(dout, "Output, after freqz");
+            // test_freqban(); //testeos están ocultos y comentados
         }
         
         private void Form1_Load(object sender, EventArgs e)
@@ -157,7 +200,7 @@ namespace GuiSonar2
             for (int xx = 0; xx < bmp.Width; xx++)
                 for (int yy = 0; yy < bmp.Height; yy++)
                     bmp.SetPixel(xx, yy, Color.FromArgb(0, 0, 0, 255));
-
+           
             for (int xx = 0; xx < bmp.Width; xx++)
                 for (int yy = 0; yy < bmp.Height; yy++)
                     bmp2.SetPixel(xx, yy, Color.FromArgb(0, 0, 0, 255));
@@ -181,17 +224,17 @@ namespace GuiSonar2
         public void timerExecute(object sender, EventArgs e)
         {
 
-            stopwatch.Reset();
-            stopwatch.Start();
+           // stopwatch.Reset();
+            //stopwatch.Start();
             makeFFT();
 
-            bufferRpm.push(asdOlapFrame);
+            bufferRpm.push(sndDataNorm);
             pictureBox1.Invalidate();
             glControl1.Invalidate();
             glControl2.Invalidate();
+            Console.WriteLine("execute timer"+ DateTime.Now.Millisecond);
             // glControlBar1.Invalidate();
             // glControlBar2.Invalidate();
-
         }
 
         public void makeFFT()
@@ -205,9 +248,8 @@ namespace GuiSonar2
 
             ////---------- NORMALIZAMOS sndDATA  ---------
             for (int i = 0; i < sndData.Length; i++)
-            {
                 sndDataNorm[i] = (float)((sndData[i] - 128.0) / 128.0);
-            }
+
             //--------------------------------------------
 
             asdOlapFrame = getASD(sndDataNorm);
@@ -215,7 +257,6 @@ namespace GuiSonar2
             widthDEP = this.pictureBox1.ClientSize.Width;
         }
 
-        
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
@@ -231,7 +272,7 @@ namespace GuiSonar2
                 for (int x = 0; x < bmpWidth; x++)   //   x < pictureBox1.ClientSize.Width
                     try
                     {
-                        tmp.SetPixel(x, bmpHeight - Math.Max(y, y2) - 1, Color.FromArgb((int)((byte)(asdOlapFrame[x] / asdOlapFrame.Max() * 255.0f)), 0, 0, 255));
+                        tmp.SetPixel(x, bmpHeight - Math.Max(y, y2) - 1, Color.FromArgb((int)((byte)(asdOlapFrame[x] / asdOlapFrame.Max() * 512.0f)), 0, 0, 255));
 
                     }
                     catch
@@ -476,25 +517,25 @@ namespace GuiSonar2
             Console.WriteLine(((widthDEP - 11) * trackBar2Val) / 11025 + 50);
         }
 
-        private void glControlBar2_Load(object sender, EventArgs e)
+       /* private void glControlBar2_Load(object sender, EventArgs e)
         {
             GL2Barloaded = true;
             glControlBar2.MakeCurrent();
             GL.ClearColor(Color.Red);
             this.glControlBar2.Location = new Point(50, 95);
 
-        }
+        }*/
 
-        private void glControlBar1_Load(object sender, EventArgs e)
+       /* private void glControlBar1_Load(object sender, EventArgs e)
         {
             GL1Barloaded = true;
             glControlBar1.MakeCurrent();
             GL.ClearColor(Color.Red);
             this.glControlBar1.Location = new Point(50, 95);
 
-        }
+        }*/
 
-        private void glControlBar2_Paint(object sender, PaintEventArgs e)
+        /*private void glControlBar2_Paint(object sender, PaintEventArgs e)
         {   //Console.WriteLine("glControlBar2_Paint");
             if (!GL2Barloaded) // Play nice
                 return;
@@ -506,9 +547,9 @@ namespace GuiSonar2
             //Console.WriteLine(((widthDEP - 11) * trackBar2Val) / 11025 + 50);
 
 
-        }
+        }*/
 
-        private void glControlBar1_Paint(object sender, PaintEventArgs e)
+       /* private void glControlBar1_Paint(object sender, PaintEventArgs e)
         {
             if (!GL1Barloaded) // Play nice
                 return;
@@ -517,7 +558,7 @@ namespace GuiSonar2
             this.glControlBar1.Location = new Point(((widthDEP - 11) * trackBar1Val) / 11025 + 50, 100);
             glControlBar1.SwapBuffers();
         }
-
+        */
         private void glControlTicks_Load(object sender, EventArgs e)
         {
             GLTickLoaded = true;
@@ -532,6 +573,11 @@ namespace GuiSonar2
             glControlTicks.MakeCurrent();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             glControlTicks.SwapBuffers();
+        }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

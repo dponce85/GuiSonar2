@@ -32,7 +32,7 @@ namespace GuiSonar2
                     an = (ij2 - ij1) * (int)delta;
                     if (an <= (kancho * delta))
                     {
-                        Epor = SumaElementos(Poli, ij1, ij2);            //-->Calculo de la Potencia del PIN
+                        Epor = SumaElementosf(Poli, ij1, ij2);            //-->Calculo de la Potencia del PIN
                         kp1 = ij1 - kad;
                         if (kp1 < 1)
                         {
@@ -44,8 +44,8 @@ namespace GuiSonar2
                             kp2 = NF;
                         }
 
-                        por1 = SumaElementos(Poli, kp1, ij1 - 1) * 100 / Epor;  //-->Porcentaje de Potencia de banda adyacente inferior
-                        por2 = SumaElementos(Poli, ij2 + 1, kp2) * 100 / Epor;  //-->Porcentaje de Potencia de banda adyacente superior
+                        por1 = SumaElementosf(Poli, kp1, ij1 - 1) * 100 / Epor;  //-->Porcentaje de Potencia de banda adyacente inferior
+                        por2 = SumaElementosf(Poli, ij2 + 1, kp2) * 100 / Epor;  //-->Porcentaje de Potencia de banda adyacente superior
 
                         if (por1 < 25 && por2 < 25)         //--->Validación de existencia de portadora fuerte entre 2 bandas asyacentes
                         {
@@ -150,7 +150,8 @@ namespace GuiSonar2
             }
             return index;
         }
-        float SumaElementos(float[] Poli, int m, int n)
+
+        float SumaElementosf(float[] Poli, int m, int n)
         {
             float s = 0;
             for (int i = m; i <= n; i++)
@@ -160,10 +161,20 @@ namespace GuiSonar2
 
             return s;
         }
-
-        float[] ProductoPunto(float[] Poli, float[] Poli2, float factor)
+        double SumaElementos(float[] Poli, int m, int n)
         {
-            float[] Poli3 = new float[Poli.Length];
+            double s = 0;
+            for (int i = m; i <= n; i++)
+            {
+                s = s + Poli[i];
+            }
+
+            return s;
+        }
+
+        double[] ProductoPunto(float[] Poli, float[] Poli2, double factor)
+        {
+            double[] Poli3 = new double[Poli.Length];
 
             for (int i = 0; i < Poli.Length; i++)
             {
@@ -173,9 +184,9 @@ namespace GuiSonar2
             return Poli3;
         }
 
-        float[] ProductoEscalar(float[] Poli, float factor)
+        double[] ProductoEscalar(double[] Poli, float factor)
         {
-            float[] Poli2 = new float[Poli.Length];
+            double[] Poli2 = new double[Poli.Length];
 
             for (int i = 0; i < Poli.Length; i++)
             {
@@ -207,11 +218,12 @@ namespace GuiSonar2
 
         float[] getASD(float[] samples)
         {
-            float[] fSamp = new float[samples.Length];
+            double[] fSamp = new double[samples.Length];
+            float[] afSamp = new float[NFFT/2];
             float[] window = new float[samples.Length];
-            float[] wSamp = new float[samples.Length];
+            double[] wSamp = new double[samples.Length];
             float[] wSamp2 = new float[samples.Length * 2];
-            float wndAtt;
+            double wndAtt;
             //int L;
             //int NFFT;
             //L    = samples.Length;  // Length of signal
@@ -220,17 +232,18 @@ namespace GuiSonar2
             window = hann(L);
             wndAtt = SumaElementos(window, 0, (window.Length - 1)) / L;
             wSamp = ProductoPunto(samples, window, 1 / wndAtt);//ventaneamos la señal(512)
-            wSamp2 = IniFFT_Pin(wSamp);//duplicamos la ventana y completamos con ceros(1024)
-
+            //wSamp2 = IniFFT_Pin(wSamp);//duplicamos la ventana y completamos con ceros(1024)
+            double[] wSampFFT= new double[NFFT];
+            Fourier.FFT(wSamp, wSampFFT);
             // Fourier.FFT(wSamp2, NFFT, FourierDirection.Forward);
-            fSamp = ProductoEscalar(wSamp2, 1 / (float)L);
-            afSamp = new float[NFFT / 2];
-            afSamp = moduloArrayComplejo(fSamp, NFFT);
+            wSampFFT = ProductoEscalar(wSampFFT, 1 / (float)L);
+            
+            afSamp = moduloArrayComplejo(wSampFFT, NFFT);
 
             return afSamp;
         }
 
-        float[] IniFFT_Pin(float[] wSamp)
+        /*float[] IniFFT_Pin(float[] wSamp)
         {
             float[] wSamp2 = new float[wSamp.Length * 2];
 
@@ -241,31 +254,20 @@ namespace GuiSonar2
             }
 
             return (wSamp2);
-        }
+        }*/
 
-        float[] moduloArrayComplejo(float[] Poli, int limite)
+        float[] moduloArrayComplejo(double[] Poli, int size_in)
         {
             float modulo;
-            float[] tmp = new float[limite/2 ];
-            for (int i = 0; i < (limite - 1); i=i+2)
+            float[] tmp = new float[size_in/2 ];
+            for (int i = 0; i < tmp.Length; i=i+1)
             {
-                modulo = 2 * (float)Math.Sqrt(Poli[i] * Poli[i] + Poli[i + 1] * Poli[i + 1]);
-                tmp[i / 2] = modulo;
+                modulo = (float)Math.Sqrt(Poli[i] * Poli[i] + Poli[size_in - 1 - i] * Poli[size_in - 1 - i]);
+                tmp[i] = modulo;
             }
             return tmp;
         }
 
-        float[] AbsolutoArrayComplejo(float[] Poli, int limite)
-        {
-            float modulo;
-            float[] tmp = new float[limite / 2];
-            for (int i = 0; i < (limite - 1); i++)
-            {
-                modulo = (float)(Poli[i] * Poli[i] + Poli[i + 1] * Poli[i + 1]);
-                tmp[i / 2] = modulo;
-            }
-            return tmp;
-        }
 
         float[] hann(int n)
         {

@@ -25,7 +25,7 @@ namespace GuiSonar2
 
             bufferData = new float[bufferLen];
         }
-        Stopwatch stopwatch = new Stopwatch();
+        //Stopwatch stopwatch = new Stopwatch();
 
         public void push(float[] newData)
         {
@@ -43,10 +43,10 @@ namespace GuiSonar2
             if (wrPos >= bLen)
             {
                 wrPos = wrPos % bLen;
-                stopwatch.Stop();
+                /*stopwatch.Stop();
                 Console.WriteLine("Time elapsed (s): {0}", stopwatch.Elapsed.TotalSeconds);
                 stopwatch.Reset();
-                stopwatch.Start();
+                stopwatch.Start();*/
             }
             // Console.WriteLine(wrPos); 
 

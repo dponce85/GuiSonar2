@@ -178,7 +178,7 @@ namespace GuiSonar2
                         i++;
                     }
                 }
-                PlotVar(B,"B=filter3", true);
+                //PlotVar(B,"B=filter3", true);
                 pote = (float)Math.Ceiling(Math.Log((BEN[0].Length*BEN.Length), 2.0f));
                 NNF = (int)Math.Pow(2.0, pote);
                 Array.Resize(ref FJ, 2 * NNF);
@@ -208,17 +208,22 @@ namespace GuiSonar2
                 /* [FJ,fre]=freqz(B.*vb,1,2*NNF,fs1);
                   FJ=abs(FJ);
                   FJ=FJ.*FJ; */
-                float[] tempQZ= new float[B.Length];
+                double[] tempQZ= new double[B.Length];
+                double[] preFJ= new double[4*NNF];
 
                 for (int i = 0; i < B.Length; i++)
                 {   tempQZ[i] = B[i] * vb[i];  }
 
+                Fourier.FFT(tempQZ, preFJ);
+                FJ = moduloArrayComplejo(preFJ, preFJ.Length);
                //FJ = freqz(tempQZ,1,2*NNF,fs1);
                //FJ=FJ.*FJ
                // FJ = new float[pruFJ.Length];
-                for (int i = 0; i < pruFJ.Length; i++)
+                /*for (int i = 0; i < pruFJ.Length; i++)
                 { FJ[i] = pruFJ[i]; }
+                */
                 
+
                 fre = new float[2 * NNF]; // fre
                 for (int i = 0; i < (2 * NNF); i++)
                 {
