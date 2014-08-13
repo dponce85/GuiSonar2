@@ -708,7 +708,6 @@ namespace GuiSonar2
             float PI = (float)Math.PI;
             int L = 400; /* Filter length */
             int Pr_L = L;
-            int M = 64;
 
             int N = L - 2;
 
